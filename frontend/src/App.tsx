@@ -64,40 +64,40 @@ export const App: React.FC = () => {
           className={`tab-btn ${activeTab === 'console' ? 'active' : ''}`}
           onClick={() => setActiveTab('console')}
         >
-          <Terminal size={17} />
-          <span>Incident Console & Investigation</span>
+          <Terminal size={16} />
+          <span>Incident Console</span>
         </button>
 
         <button
           className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setActiveTab('dashboard')}
         >
-          <LayoutDashboard size={17} />
-          <span>DevOps Incident Feed</span>
+          <LayoutDashboard size={16} />
+          <span>Incident Feed</span>
         </button>
 
         <button
           className={`tab-btn ${activeTab === 'memory' ? 'active' : ''}`}
           onClick={() => setActiveTab('memory')}
         >
-          <Brain size={17} />
-          <span>Hindsight Memory Bank</span>
+          <Brain size={16} />
+          <span>Hindsight Bank</span>
         </button>
 
         <button
           className={`tab-btn ${activeTab === 'timeline' ? 'active' : ''}`}
           onClick={() => setActiveTab('timeline')}
         >
-          <Clock size={17} />
-          <span>Memory Timeline & Learning</span>
+          <Clock size={16} />
+          <span>Memory Timeline</span>
         </button>
 
         <button
           className={`tab-btn ${activeTab === 'architecture' ? 'active' : ''}`}
           onClick={() => setActiveTab('architecture')}
         >
-          <Layers size={17} />
-          <span>Architecture & Core Loop</span>
+          <Layers size={16} />
+          <span>Architecture</span>
         </button>
       </nav>
 

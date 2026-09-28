@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, Brain, Search, Clock, TrendingDown } from 'lucide-react';
+import { AlertTriangle, Brain, Clock, Zap } from 'lucide-react';
 import { DashboardStats } from '../types';
 
 interface StatsBannerProps {
@@ -15,73 +15,62 @@ export const StatsBanner: React.FC<StatsBannerProps> = ({ stats }) => {
     {
       label: 'Active Incidents',
       value: stats ? stats.active_incidents_count : 0,
-      icon: <AlertTriangle size={18} color="#f43f5e" />,
-      color: '#f43f5e',
-      subtext: 'Requires triage'
+      icon: <AlertTriangle size={18} color="#ef4444" />,
+      color: '#ef4444',
+      badge: 'Live Triage'
     },
     {
-      label: 'Resolved Incidents',
-      value: stats ? stats.resolved_incidents_count : 15,
-      icon: <CheckCircle2 size={18} color="#10b981" />,
-      color: '#10b981',
-      subtext: 'Experience indexed'
-    },
-    {
-      label: 'Memories in Hindsight',
+      label: 'Hindsight Memories',
       value: stats ? stats.memories_stored_count : 45,
-      icon: <Brain size={18} color="#38bdf8" />,
-      color: '#38bdf8',
-      subtext: 'Bank: incidentiq-ops'
+      icon: <Brain size={18} color="#6366f1" />,
+      color: '#6366f1',
+      badge: 'bank: incidentiq-ops'
     },
     {
       label: 'Memory-Assisted MTTR',
       value: `${withMemMTTR}m`,
       icon: <Clock size={18} color="#10b981" />,
       color: '#10b981',
-      subtext: `vs ${noMemMTTR}m without memory`
+      badge: `vs ${noMemMTTR}m baseline`
     },
     {
-      label: 'Resolution Improvement',
-      value: `-${improvement}%`,
-      icon: <TrendingDown size={18} color="#10b981" />,
-      color: '#10b981',
-      subtext: 'Estimated from recorded history'
-    },
-    {
-      label: 'Hindsight Bank Status',
-      value: stats?.hindsight_connected ? 'Connected' : 'Standalone',
-      icon: <Search size={18} color="#a855f7" />,
-      color: '#a855f7',
-      subtext: 'Multi-strategy recall active'
+      label: 'Resolution Speedup',
+      value: `+${improvement}%`,
+      icon: <Zap size={18} color="#8b5cf6" />,
+      color: '#8b5cf6',
+      badge: 'Faster MTTR'
     }
   ];
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(185px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem', marginBottom: '1.5rem' }}>
       {cards.map((card, idx) => (
         <div 
           key={idx} 
           className="glass-card" 
           style={{ 
-            padding: '1.15rem 1.25rem', 
-            position: 'relative', 
-            overflow: 'hidden',
-            borderLeft: `3px solid ${card.color}` 
+            padding: '1rem 1.15rem', 
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderLeft: `3px solid ${card.color}`,
+            borderRadius: '10px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+            <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
               {card.label}
             </span>
-            <div style={{ padding: '0.35rem', background: `${card.color}15`, borderRadius: '6px' }}>
+            <div style={{ padding: '0.3rem', background: `${card.color}12`, borderRadius: '6px' }}>
               {card.icon}
             </div>
           </div>
-          <div style={{ fontSize: '1.55rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.2rem' }}>
-            {card.value}
-          </div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-            {card.subtext}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>
+              {card.value}
+            </div>
+            <span style={{ fontSize: '0.7rem', color: '#64748b', background: '#f8fafc', padding: '0.15rem 0.45rem', borderRadius: '4px', border: '1px solid #f1f5f9' }}>
+              {card.badge}
+            </span>
           </div>
         </div>
       ))}
