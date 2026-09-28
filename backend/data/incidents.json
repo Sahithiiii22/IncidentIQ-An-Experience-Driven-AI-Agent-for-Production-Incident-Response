@@ -1,0 +1,1000 @@
+[
+  {
+    "id": "INC-104",
+    "title": "Database Connection Timeout on Checkout Gateway",
+    "description": "Users encountering 503 Service Unavailable during checkout. Database connections timing out after 30s threshold.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR 2026-08-12 14:22:01 [pool-manager] connection pool exhausted (max=50, in_use=50, waiting=142)\nFATAL [checkout-svc] database timeout after 30000ms executing SQL: SELECT * FROM payment_methods WHERE customer_id = ?\nHTTP/1.1 503 Service Unavailable",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL connection pool saturation due to unclosed connection leak in async retry loop under high traffic.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and deployed patch closing leaked sessions in retry middleware.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 14,
+    "lessons_learned": [
+      "Always inspect connection pool saturation metrics before restarting PostgreSQL instances.",
+      "Connection pool exhaustion typically mimics database crash but is purely client pool constraint.",
+      "Increasing pool size from 50 to 100 instantly restored 99.9% checkout availability."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-118",
+    "title": "Payment API 503 - DB Connection Saturation",
+    "description": "Payment microservice returning intermittent 503 errors and DB pool queue backlog.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "WARN [db-client] Pool size 50 reached 100% capacity\nERROR [api-gateway] Upstream service returned 503 for /v2/charge\nSocketTimeoutException: Read timed out to db-master.internal:5432",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Database connection saturation caused by sudden burst of webhook callbacks holding connections open.",
+    "fix_applied": "Restarted connection pool supervisor and increased pool capacity from 75 -> 120 with aggressive 5s query timeout.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 9,
+    "lessons_learned": [
+      "Payment API 503s with 'Read timed out' are 90% correlated with DB connection pool exhaustion rather than DB engine crashes.",
+      "Adjusting pool size + timeout limits avoids full service restarts."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-125",
+    "title": "PostgreSQL Deadlock Detected on Order Processing",
+    "description": "Order placement requests failing with 500 Internal Server Error. Deadlock detected in database transaction logs.",
+    "severity": "High",
+    "service": "Order Service",
+    "error_logs": "ERROR: deadlock detected\nDETAIL: Process 4120 waits for ShareLock on transaction 88102; blocked by process 4118.\nHINT: See server log for query details.\nSQLState: 40P01",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Conflicting lock acquisition order between inventory deduction and order status update queries in concurrent workers.",
+    "fix_applied": "Normalized row-locking sequence in inventory_service.py using SELECT FOR UPDATE in strictly ascending SKU order.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 22,
+    "lessons_learned": [
+      "Ensure all multi-row locking transactions acquire row locks in deterministic alphabetical or ID order.",
+      "Deadlock 40P01 errors cannot be resolved by scaling hardware; code-level ordering is required."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-131",
+    "title": "Read Replica Lag Causing Stale User Dashboard",
+    "description": "User profile and dashboard updates not reflecting immediately. Read replicas lagging by 480 seconds.",
+    "severity": "Medium",
+    "service": "User Service",
+    "error_logs": "WARN [replica-monitor] Replication lag on db-read-02 exceeded SLA (current: 485s, threshold: 30s)\nQuery duration: 42000ms for SELECT * FROM user_activity_log WHERE org_id = ?",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Unindexed table scan on user_activity_log table locking replica CPU during heavy read bursts.",
+    "fix_applied": "Created composite B-tree index (org_id, created_at DESC) concurrently on master; replica lag dropped to 200ms within 4 minutes.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 18,
+    "lessons_learned": [
+      "Replication lag spikes are almost always triggered by long-running sequential table scans on read replicas.",
+      "Use CREATE INDEX CONCURRENTLY to avoid blocking read traffic."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-142",
+    "title": "Authentication Failures After JWKS Key Rotation",
+    "description": "All downstream services rejecting incoming user requests with 401 Unauthorized following scheduled key rotation.",
+    "severity": "Critical",
+    "service": "Auth Service",
+    "error_logs": "ERROR [jwt-validator] Invalid signature for token with kid 'auth-key-2026-b'\nJWKS cache missing key id 'auth-key-2026-b'. Available keys: ['auth-key-2025-a']\nHTTP 401 Unauthorized for 100% of gateway traffic",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "API gateway cached JWKS public keys with TTL of 24 hours without cache invalidation hook on key rollover.",
+    "fix_applied": "Flushed Redis JWKS cache on API gateway and patched JWKS client to refresh on unknown kid receipt.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lessons_learned": [
+      "JWKS key rotation requires dual-key coexistence (grace period) for 48 hours before retiring old keys.",
+      "Always implement on-demand JWKS cache busting when encountering unknown 'kid' headers."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-149",
+    "title": "Cascading 429 Too Many Requests Due to Redis Cluster Freeze",
+    "description": "Legitimate traffic getting throttled globally. Rate limit token bucket checks timing out.",
+    "severity": "High",
+    "service": "API Gateway",
+    "error_logs": "ERROR [rate-limiter] Redis connection timeout to redis-sentinel.internal:6379\nFallback to strict-block mode triggered\nHTTP 429 Too Many Requests returned to 45,000 clients",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Redis rate limiter sentinel ran out of available file descriptors (maxclients reached 10,000).",
+    "fix_applied": "Increased Redis maxclients to 50,000, set fallback mode to 'fail-open' in gateway configuration, and deployed connection pooling for Redis clients.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 11,
+    "lessons_learned": [
+      "Rate limiters should ALWAYS fail-open in production rather than fail-closed during Redis outages.",
+      "Tune OS ulimit and Redis maxclients on edge ingress infrastructure."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-155",
+    "title": "Inventory Service CrashLoopBackOff - OOMKilled",
+    "description": "Kubernetes pods for inventory-service terminating with Exit Code 137 (OOMKilled) under catalog refresh load.",
+    "severity": "Critical",
+    "service": "Inventory Service",
+    "error_logs": "State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-app exceeded memory limit: 512Mi (used: 518Mi)",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "JVM heap memory limit (-Xmx) was configured higher than Kubernetes pod cgroup memory limit (512Mi vs 768Mi heap).",
+    "fix_applied": "Updated Kubernetes resource limits to 1536Mi memory and configured Java container support flags `-XX:MaxRAMPercentage=75.0`.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lessons_learned": [
+      "Exit Code 137 is always Linux kernel OOM killer terminating the container.",
+      "Container memory limits in Helm/K8s manifests must be at least 30% higher than JVM heap allocations to allow off-heap metaspace.",
+      "Setting MaxRAMPercentage prevents manual heap/cgroup mismatches."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-162",
+    "title": "Disk Full /var/log Freezing Message Ingestion",
+    "description": "Kafka broker node refusing writes. Local disk utilization reached 100% on /var/log/journal.",
+    "severity": "High",
+    "service": "Kafka Ingest",
+    "error_logs": "FATAL [kafka-broker-3] No space left on device: '/data/kafka-logs/events-0/00000000.log'\nERROR: write /var/log/app.log: no space left on device\nSystemd-journald: Corrupted log rotation file",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Debug level logging left enabled during staging load test saturated 100GB NVMe partition due to broken logrotate cron.",
+    "fix_applied": "Purged uncompressed old logs, corrected logrotate configuration with hourly rotation and 7-day gzip retention, switched logger to INFO level.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 15,
+    "lessons_learned": [
+      "Check disk partition utilization with `df -h` immediately when I/O operations fail with 'No space left on device'.",
+      "Ensure logrotate daemon has active systemd timer monitoring."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-168",
+    "title": "Intermittent DNS Resolution Failures Across EKS Cluster",
+    "description": "Cross-service HTTP and gRPC calls failing intermittently with 'Could not resolve host: service.namespace.svc.cluster.local'.",
+    "severity": "Critical",
+    "service": "CoreDNS",
+    "error_logs": "ERROR [client] dial tcp: lookup auth-service.prod.svc.cluster.local: i/o timeout\nCoreDNS error: 2026-07-19 [ERROR] plugin/errors: 2 auth-service.prod.svc.cluster.local. A: read udp 10.0.12.4:53: i/o timeout\nCoreDNS CPU throttling at 99.8%",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "CoreDNS deployment was underscaled (only 2 replicas) handling 40,000 queries/sec with strict 100m CPU limit causing kernel CFS throttling.",
+    "fix_applied": "Scaled CoreDNS deployment from 2 -> 8 replicas and enabled NodeLocal DNSCache daemonset across all worker nodes.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 16,
+    "lessons_learned": [
+      "Cluster-wide random connection timeouts are frequently CoreDNS CPU starvation rather than target service failure.",
+      "Deploy NodeLocal DNSCache for any cluster exceeding 50 worker nodes."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-173",
+    "title": "500 Errors Post-Release: Column 'currency_code' Does Not Exist",
+    "description": "Immediately following v2.41 release, 100% of billing invoice generation endpoints throwing 500 exceptions.",
+    "severity": "Critical",
+    "service": "Billing Service",
+    "error_logs": "ERROR [invoice-generator] column invoices.currency_code does not exist\nLINE 1: SELECT id, amount, currency_code FROM invoices WHERE id = $1\nRelease tag: release-v2.41.0 deployed at 18:00:00 UTC",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Blue/green deployment activated new v2.41 application pods before Flyway DB migration step finished executing on RDS.",
+    "fix_applied": "Manually triggered Flyway migration step `V2_41__add_currency_code.sql` and updated CI/CD pipeline gate to verify migration health before pod rollout.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 7,
+    "lessons_learned": [
+      "Never perform destructive or non-backwards-compatible schema changes in single deployment steps.",
+      "Use Expand-and-Contract database migration pattern: (1) Add nullable column, (2) Deploy code reading column, (3) Apply NOT NULL constraint."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-179",
+    "title": "Notification Service Crash On Boot (Connection Refused)",
+    "description": "Newly deployed notification service pods entering CrashLoopBackOff immediately after deployment.",
+    "severity": "High",
+    "service": "Notification Service",
+    "error_logs": "FATAL [main] Failed to connect to Redis queue broker at redis-cluster.internal:63799\nError: dial tcp: connection refused on port 63799\nConfig dump: REDIS_PORT=63799 (Expected: 6379)",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Typo in Helm values.yaml configmap: `REDIS_PORT: 63799` instead of standard `6379`.",
+    "fix_applied": "Corrected REDIS_PORT value to 6379 in Kubernetes ConfigMap and performed rolling restart.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 5,
+    "lessons_learned": [
+      "Connection refused on non-standard ports indicates environment variable config typo.",
+      "Implement ConfigMap schema validation in CI pre-commit checks."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-185",
+    "title": "GraphQL Gateway Latency Surge (Thread Pool Starvation)",
+    "description": "GraphQL gateway response time spiked from 45ms to 12,000ms. Worker threads exhausted.",
+    "severity": "High",
+    "service": "GraphQL Gateway",
+    "error_logs": "WARN [thread-pool] Active worker threads: 200/200 (queue backlog: 1,420)\nNested query detected: depth 14 on query { user { friends { friends { orders { items ... } } } } }\nMemory utilization: 94%",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Malicious or unoptimized deeply nested circular GraphQL query executed without depth and complexity limiting.",
+    "fix_applied": "Configured GraphQL max query depth limit = 6 and cost analysis limiter in Apollo Gateway middleware.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 13,
+    "lessons_learned": [
+      "All public GraphQL endpoints must enforce strict query depth (max 6) and query complexity analysis limits.",
+      "Thread starvation with high queue backlog is typically caused by unconstrained recursive resolver queries."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-192",
+    "title": "Kafka Consumer Group Rebalance Storm on Order Processing",
+    "description": "Order processing lag increasing exponentially. Consumers constantly leaving and re-joining consumer group.",
+    "severity": "High",
+    "service": "Order Processing",
+    "error_logs": "WARN [consumer-coordinator] Revoking previously assigned partitions for group order-processors\nHeartbeat timeout expired (max.poll.interval.ms: 30000 exceeded, elapsed: 48200ms)\nInitiating rebalance (generation 412 -> 413)",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Heavy third-party fraud check API call inside consumer loop blocked message processing beyond max.poll.interval.ms.",
+    "fix_applied": "Increased max.poll.interval.ms to 300000ms and offloaded fraud check to asynchronous background thread pool.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 17,
+    "lessons_learned": [
+      "Consumer group rebalance storms occur when message processing exceeds `max.poll.interval.ms`.",
+      "Never perform synchronous blocking I/O calls directly within the Kafka consumer poll loop."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-198",
+    "title": "AWS SDK Metadata Token Expiration Failures (IAM Role Access)",
+    "description": "S3 upload operations failing with 403 Forbidden across all worker nodes simultaneously.",
+    "severity": "High",
+    "service": "Storage Service",
+    "error_logs": "ERROR [aws-sdk] Unable to load credentials from EC2 Metadata Service: HTTP 401 Unauthorized\nPUT http://169.254.169.254/latest/api/token - Hop limit exceeded\nS3 Upload failed: CredentialsProviderError",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Containerized workloads in bridge networking required IMDSv2 metadata hop limit = 2 (was set to default 1).",
+    "fix_applied": "Updated EC2 Launch Template `HttpPutResponseHopLimit` from 1 -> 2 via AWS CLI and refreshed instance metadata.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 10,
+    "lessons_learned": [
+      "Docker and Kubernetes pods using host networking can access IMDSv2 with hop limit 1, but bridge networking requires hop limit 2.",
+      "S3 403 / CredentialsProviderError on EC2 is usually IMDS hop limit exhaustion."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-203",
+    "title": "Redis Master 100% CPU on Flash Sale Product Cache Key",
+    "description": "Redis single-threaded master pinned at 100% CPU. Catalog page load latency escalated to 8.5s.",
+    "severity": "Critical",
+    "service": "Catalog Service",
+    "error_logs": "WARN [redis-monitor] Engine CPU: 99.9%\nHot key detected: 'product:sku:99812-flash-sale' requested 180,000 ops/sec\nCommand: MGET product:sku:99812-flash-sale:details product:sku:99812-flash-sale:inventory",
+    "timestamp": "2026-08-15T10:00:00Z",
+    "status": "Resolved",
+    "root_cause": "Single Redis key receiving 180,000 reads/sec without local in-memory L1 cache on frontend instances.",
+    "fix_applied": "Enabled in-process L1 Caffeine cache with 5-second TTL on catalog microservices and replicated hot key across Redis read replicas.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 14,
+    "lessons_learned": [
+      "Redis single-threaded architecture cannot handle >100k requests/sec to a single hot key.",
+      "Use client-side L1 micro-caching (5-10s TTL) to absorb flash sale hot key spikes."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-225",
+    "title": "Production API 503 Errors & DB Timeout",
+    "description": "Users are receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T12:44:06.017567Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lessons_learned": [
+      "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+      "When Payment API encounters 'Production API 503 Errors & DB Timeout', verify root cause 'PostgreSQL connection pool exhausted under high checkout burst.' and apply: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-149",
+      "INC-149",
+      "INC-149",
+      "INC-118"
+    ]
+  },
+  {
+    "id": "INC-226",
+    "title": "Database Connection Pool Exhaustion on Orders DB",
+    "description": "Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T12:44:06.293933Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lessons_learned": [
+      "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+      "When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-227",
+    "title": "Production Payment API 503 Errors & DB Timeout",
+    "description": "Users receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "WARN: [db-client] connection pool reached 100% capacity\nERROR: Upstream returned 503 for /v2/charge\nSocketTimeoutException: Read timed out to db-master.internal:5432",
+    "timestamp": "2026-09-28T12:44:06.326605Z",
+    "status": "Active",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-226",
+      "INC-226",
+      "INC-226"
+    ]
+  },
+  {
+    "id": "INC-228",
+    "title": "Payment 503",
+    "description": "Timeout",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "connection pool exhausted",
+    "timestamp": "2026-09-28T12:47:45.603681Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-226",
+      "INC-226",
+      "INC-226",
+      "INC-225"
+    ]
+  },
+  {
+    "id": "INC-229",
+    "title": "Production API 503 Errors & DB Timeout",
+    "description": "Users are receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR 2026-09-28 14:10:02 [pool-manager] connection pool exhausted (max=50, in_use=50, waiting=142)\nFATAL [checkout-svc] database timeout after 30s executing SQL: SELECT * FROM payment_methods WHERE customer_id = ?\nHTTP/1.1 503 Service Unavailable",
+    "timestamp": "2026-09-28T12:49:02.805056Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-226",
+      "INC-226",
+      "INC-226",
+      "INC-225"
+    ]
+  },
+  {
+    "id": "INC-230",
+    "title": "Payment API returning 503",
+    "description": "Customers are unable to complete checkout. Error rate increased to 35%.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "connection pool exhausted\nPostgreSQL timeout\nHTTP 503",
+    "timestamp": "2026-09-28T12:51:19.271434Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-226",
+      "INC-226",
+      "INC-226",
+      "INC-225"
+    ]
+  },
+  {
+    "id": "INC-231",
+    "title": "Payment API returning 503",
+    "description": "Customers are unable to complete checkout. Error rate increased to 35%.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "connection pool exhausted\nPostgreSQL timeout\nHTTP 503",
+    "timestamp": "2026-09-28T12:51:24.904971Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-226",
+      "INC-226",
+      "INC-226",
+      "INC-225"
+    ]
+  },
+  {
+    "id": "INC-232",
+    "title": "Production API 503 Errors & DB Timeout",
+    "description": "Users are receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T13:04:14.414726Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lessons_learned": [
+      "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+      "When Payment API encounters 'Production API 503 Errors & DB Timeout', verify root cause 'PostgreSQL connection pool exhausted under high checkout burst.' and apply: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-226",
+      "INC-225",
+      "INC-149",
+      "INC-118"
+    ]
+  },
+  {
+    "id": "INC-233",
+    "title": "Database Connection Pool Exhaustion on Orders DB",
+    "description": "Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T13:04:18.217877Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lessons_learned": [
+      "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+      "When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-234",
+    "title": "Production Payment API 503 Errors & DB Timeout",
+    "description": "Users receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "WARN: [db-client] connection pool reached 100% capacity\nERROR: Upstream returned 503 for /v2/charge\nSocketTimeoutException: Read timed out to db-master.internal:5432",
+    "timestamp": "2026-09-28T13:04:21.229666Z",
+    "status": "Active",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-233",
+      "INC-232",
+      "INC-226"
+    ]
+  },
+  {
+    "id": "INC-235",
+    "title": "Production API 503 Errors & DB Timeout",
+    "description": "Users are receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T13:12:49.981135Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lessons_learned": [
+      "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+      "When Payment API encounters 'Production API 503 Errors & DB Timeout', verify root cause 'PostgreSQL connection pool exhausted under high checkout burst.' and apply: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-233",
+      "INC-232",
+      "INC-226",
+      "INC-225"
+    ]
+  },
+  {
+    "id": "INC-236",
+    "title": "Database Connection Pool Exhaustion on Orders DB",
+    "description": "Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T13:12:55.289448Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lessons_learned": [
+      "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+      "When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-237",
+    "title": "Production Payment API 503 Errors & DB Timeout",
+    "description": "Users receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "WARN: [db-client] connection pool reached 100% capacity\nERROR: Upstream returned 503 for /v2/charge\nSocketTimeoutException: Read timed out to db-master.internal:5432",
+    "timestamp": "2026-09-28T13:12:56.283033Z",
+    "status": "Active",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-236",
+      "INC-235",
+      "INC-233"
+    ]
+  },
+  {
+    "id": "INC-238",
+    "title": "Payment API 503 During Peak Traffic",
+    "description": "Customers are unable to complete payments during peak traffic. The Payment API is returning HTTP 503 errors intermittently, causing checkout failures and failed transactions.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "HTTP 503 Service Unavailable\nPaymentRequest failed\nPostgreSQL connection pool exhausted\nTimeout waiting for database connection\nActive connections: 50/50\nCheckout traffic increased by 40%",
+    "timestamp": "2026-09-28T13:18:00.363855Z",
+    "status": "Resolved",
+    "root_cause": "The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.",
+    "fix_applied": "Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lessons_learned": [
+      "Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit.",
+      "When Payment API encounters 'Payment API 503 During Peak Traffic', verify root cause 'The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.' and apply: 'Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-236",
+      "INC-235",
+      "INC-233",
+      "INC-232"
+    ]
+  },
+  {
+    "id": "INC-239",
+    "title": "Production API 503 Errors & DB Timeout",
+    "description": "Users are receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T13:29:59.447031Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-238",
+      "INC-236",
+      "INC-235",
+      "INC-233"
+    ]
+  },
+  {
+    "id": "INC-240",
+    "title": "Production API 503 Errors & DB Timeout",
+    "description": "Users are receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T13:30:30.070746Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lessons_learned": [
+      "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+      "When Payment API encounters 'Production API 503 Errors & DB Timeout', verify root cause 'PostgreSQL connection pool exhausted under high checkout burst.' and apply: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-238",
+      "INC-236",
+      "INC-235",
+      "INC-233"
+    ]
+  },
+  {
+    "id": "INC-241",
+    "title": "Database Connection Pool Exhaustion on Orders DB",
+    "description": "Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T13:30:34.428556Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lessons_learned": [
+      "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+      "When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-242",
+    "title": "Production Payment API 503 Errors & DB Timeout",
+    "description": "Users receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "WARN: [db-client] connection pool reached 100% capacity\nERROR: Upstream returned 503 for /v2/charge\nSocketTimeoutException: Read timed out to db-master.internal:5432",
+    "timestamp": "2026-09-28T13:30:37.658038Z",
+    "status": "Active",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-241",
+      "INC-240",
+      "INC-238"
+    ]
+  },
+  {
+    "id": "INC-243",
+    "title": "Payment API returning 503 errors",
+    "description": "Customers are unable to complete checkout. Error rate increased significantly with database connection timeouts.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "connection pool exhausted\nPostgreSQL timeout\nHTTP 503",
+    "timestamp": "2026-09-28T13:36:07.049410Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors",
+    "fix_applied": "Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lessons_learned": [
+      "When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB.",
+      "When Payment API encounters 'Payment API returning 503 errors', verify root cause 'PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors' and apply: 'Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-241",
+      "INC-240",
+      "INC-238",
+      "INC-236"
+    ]
+  },
+  {
+    "id": "INC-244",
+    "title": "Payment API Connection Saturation (Test)",
+    "description": "Database connection pool saturated during high traffic test.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "FATAL: connection pool exhausted (50/50 in use)\nHTTP 503",
+    "timestamp": "2026-09-28T13:46:20.248796Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL connection pool exhaustion",
+    "fix_applied": "Increased connection pool from 50 to 100",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 10,
+    "lessons_learned": [
+      "Check connection pool saturation before restarting application instances.",
+      "When Payment API encounters 'Payment API Connection Saturation (Test)', verify root cause 'PostgreSQL connection pool exhaustion' and apply: 'Increased connection pool from 50 to 100'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-629",
+      "INC-104",
+      "TEST-HINDSIGHT-001"
+    ]
+  },
+  {
+    "id": "INC-245",
+    "title": "Checkout Payment Failures During Traffic Spike",
+    "description": "Customers are receiving HTTP 503 errors during peak traffic and database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "503 Service Unavailable\nNo available connections in pool\nConnection acquisition timeout",
+    "timestamp": "2026-09-28T13:47:04.292901Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-629",
+      "INC-104",
+      "INC-244",
+      "INC-729"
+    ]
+  },
+  {
+    "id": "INC-246",
+    "title": "Payment Gateway Connection Saturation",
+    "description": "Customer checkout is timing out with DB connection pool exhaustion.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "HTTP 503 Service Unavailable\nPool size 50 reached 100% capacity\nConnection acquisition timeout",
+    "timestamp": "2026-09-28T13:57:46.300123Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-946",
+      "TEST-HINDSIGHT-001",
+      "INC-104",
+      "INC-175"
+    ]
+  },
+  {
+    "id": "INC-247",
+    "title": "Order Service Pods Crashing During Traffic Spike",
+    "description": "Multiple Order Service pods are restarting repeatedly during increased traffic. Users are experiencing slow order processing and some order requests are failing.",
+    "severity": "Critical",
+    "service": "Order Service",
+    "error_logs": "Pod terminated with OOMKilled\nContainer memory usage reached configured limit\nRestart count increasing\nMemory utilization: 98%\nTraffic increased by approximately 35%\nApplication logs show increasing request backlog before termination",
+    "timestamp": "2026-09-28T14:01:19.326472Z",
+    "status": "Resolved",
+    "root_cause": "The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.",
+    "fix_applied": "Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lessons_learned": [
+      "Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic.",
+      "When Order Service encounters 'Order Service Pods Crashing During Traffic Spike', verify root cause 'The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.' and apply: 'Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-736",
+      "INC-244",
+      "TEST-HINDSIGHT-001",
+      "INC-692"
+    ]
+  },
+  {
+    "id": "INC-248",
+    "title": "Intermittent DNS Lookup Timeouts in EKS",
+    "description": "Internal microservice-to-microservice gRPC calls failing with host lookup timeout.",
+    "severity": "Critical",
+    "service": "CoreDNS",
+    "error_logs": "ERROR [client] dial tcp: lookup auth-service.prod.svc.cluster.local: i/o timeout\nCoreDNS CPU throttling at 99.8%\nQueries/sec: 45,000",
+    "timestamp": "2026-09-28T14:17:32.738098Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "TEST-HINDSIGHT-001",
+      "INC-946",
+      "INC-104",
+      "INC-692"
+    ]
+  },
+  {
+    "id": "INC-249",
+    "title": "Inventory Service Pods CrashLoopBackOff",
+    "description": "Catalog and stock sync failing across cluster. Pods terminating with Exit Code 137 under load.",
+    "severity": "Critical",
+    "service": "Inventory Service",
+    "error_logs": "State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-app exceeded memory limit: 512Mi (used: 518Mi)",
+    "timestamp": "2026-09-28T14:28:28.516192Z",
+    "status": "Resolved",
+    "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+    "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lessons_learned": [
+      "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.",
+      "When Inventory Service encounters 'Inventory Service Pods CrashLoopBackOff', verify root cause 'JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)' and apply: 'Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-247",
+      "INC-168",
+      "INC-407",
+      "INC-692"
+    ]
+  },
+  {
+    "id": "INC-250",
+    "title": "Catalog & Stock Worker Pods Crashing with Exit Code 137",
+    "description": "Inventory sync worker pods entering CrashLoopBackOff under catalog import load. Pods terminate unexpectedly.",
+    "severity": "Critical",
+    "service": "Inventory Service",
+    "error_logs": "State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-worker exceeded memory limit: 512Mi",
+    "timestamp": "2026-09-28T14:29:02.510982Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-249",
+      "INC-966",
+      "INC-247",
+      "INC-168"
+    ]
+  },
+  {
+    "id": "INC-251",
+    "title": "Inventory Service Pods CrashLoopBackOff",
+    "description": "Catalog and stock sync failing across cluster. Pods terminating with Exit Code 137 under load.",
+    "severity": "Critical",
+    "service": "Inventory Service",
+    "error_logs": "State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-app exceeded memory limit: 512Mi (used: 518Mi)",
+    "timestamp": "2026-09-28T14:29:10.474891Z",
+    "status": "Resolved",
+    "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+    "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lessons_learned": [
+      "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.",
+      "When Inventory Service encounters 'Inventory Service Pods CrashLoopBackOff', verify root cause 'JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)' and apply: 'Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml'."
+    ],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-249",
+      "INC-966",
+      "INC-247",
+      "INC-545"
+    ]
+  },
+  {
+    "id": "INC-252",
+    "title": "Catalog & Stock Worker Pods Crashing with Exit Code 137",
+    "description": "Inventory sync worker pods entering CrashLoopBackOff under catalog import load. Pods terminate unexpectedly.",
+    "severity": "Critical",
+    "service": "Inventory Service",
+    "error_logs": "State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-worker exceeded memory limit: 512Mi",
+    "timestamp": "2026-09-28T14:29:30.026809Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-251",
+      "INC-249",
+      "INC-966",
+      "INC-247"
+    ]
+  },
+  {
+    "id": "INC-253",
+    "title": "Inventory Service Pods CrashLoopBackOff",
+    "description": "Catalog and stock sync failing across cluster. Pods terminating with Exit Code 137 under load.",
+    "severity": "Critical",
+    "service": "Inventory Service",
+    "error_logs": "State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-app exceeded memory limit: 512Mi (used: 518Mi)",
+    "timestamp": "2026-09-28T14:30:10.925954Z",
+    "status": "Investigating",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-251",
+      "INC-249",
+      "INC-637",
+      "INC-966"
+    ]
+  },
+  {
+    "id": "INC-254",
+    "title": "Database Connection Pool Exhaustion on Orders DB",
+    "description": "Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable",
+    "timestamp": "2026-09-28T14:33:48.371442Z",
+    "status": "Resolved",
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lessons_learned": [
+      "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+      "When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'."
+    ],
+    "recalled_from_hindsight": false,
+    "recalled_incident_ids": []
+  },
+  {
+    "id": "INC-255",
+    "title": "Production Payment API 503 Errors & DB Timeout",
+    "description": "Users receiving intermittent 503 responses. Database connections are timing out.",
+    "severity": "Critical",
+    "service": "Payment API",
+    "error_logs": "WARN: [db-client] connection pool reached 100% capacity\nERROR: Upstream returned 503 for /v2/charge\nSocketTimeoutException: Read timed out to db-master.internal:5432",
+    "timestamp": "2026-09-28T14:34:03.499219Z",
+    "status": "Active",
+    "root_cause": null,
+    "fix_applied": null,
+    "outcome": null,
+    "resolution_time_minutes": null,
+    "lessons_learned": [],
+    "recalled_from_hindsight": true,
+    "recalled_incident_ids": [
+      "INC-946",
+      "TEST-HINDSIGHT-001",
+      "INC-254"
+    ]
+  }
+]

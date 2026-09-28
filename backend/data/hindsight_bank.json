@@ -1,0 +1,2729 @@
+[
+  {
+    "id": "MEM-190",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-254",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.. Resolved with MTTR of 25m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "self-learning",
+      "learning-rule",
+      "payment-api",
+      "memorytype.learning"
+    ],
+    "metadata": {
+      "incident_id": "INC-254",
+      "title": "Learned Rule for Payment API",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T14:34:00.903843Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-189",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-254",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 50...'. Verified fix: 'Increased database connection pool max connections from 50 -> 100 in db config.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "payment-api",
+      "memorytype.operational",
+      "sre-playbook",
+      "operational-pattern"
+    ],
+    "metadata": {
+      "incident_id": "INC-254",
+      "title": "SRE Operational Pattern: Payment API Remediation",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T14:33:56.228509Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-188",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-254",
+    "memory_type": "Incident",
+    "title": "Resolved: Database Connection Pool Exhaustion on Orders DB",
+    "service": "Payment API",
+    "content": "Incident INC-254: Database Connection Pool Exhaustion on Orders DB\nService: Payment API | Severity: Critical\nSymptoms: Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.\nError Logs: ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.\nEffective Fix: Increased database connection pool max connections from 50 -> 100 in db config.\nOutcome: Resolved (MTTR: 25 min)\nLesson: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.; When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'.",
+    "symptoms": [
+      "Checkout service failing with 503 errors",
+      "PostgreSQL connection pool limit hit under spike"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-254",
+      "title": "Resolved: Database Connection Pool Exhaustion on Orders DB",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T14:33:51.429802Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-187",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-251",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Inventory Service",
+    "service": "Inventory Service",
+    "content": "Learned Experience: Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.. Resolved with MTTR of 12m.",
+    "symptoms": [],
+    "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+    "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.",
+    "tags": [
+      "self-learning",
+      "learning-rule",
+      "inventory-service",
+      "memorytype.learning"
+    ],
+    "metadata": {
+      "incident_id": "INC-251",
+      "title": "Learned Rule for Inventory Service",
+      "service": "Inventory Service",
+      "status": "Resolved",
+      "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+      "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+      "resolution_time": "12",
+      "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups."
+    },
+    "created_at": "2026-09-28T14:29:23.651685Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-186",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-251",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Inventory Service Remediation",
+    "service": "Inventory Service",
+    "content": "Operational Pattern for Inventory Service: Observed error signature: 'State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventor...'. Verified fix: 'Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml'. Avoid generic restarts; fix directly targeted the root cause: JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap).",
+    "symptoms": [
+      "Inventory Service",
+      "production-incident"
+    ],
+    "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+    "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.",
+    "tags": [
+      "memorytype.operational",
+      "inventory-service",
+      "sre-playbook",
+      "operational-pattern"
+    ],
+    "metadata": {
+      "incident_id": "INC-251",
+      "title": "SRE Operational Pattern: Inventory Service Remediation",
+      "service": "Inventory Service",
+      "status": "Resolved",
+      "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+      "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+      "resolution_time": "12",
+      "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups."
+    },
+    "created_at": "2026-09-28T14:29:19.954078Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-185",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-251",
+    "memory_type": "Incident",
+    "title": "Resolved: Inventory Service Pods CrashLoopBackOff",
+    "service": "Inventory Service",
+    "content": "Incident INC-251: Inventory Service Pods CrashLoopBackOff\nService: Inventory Service | Severity: Critical\nSymptoms: Catalog and stock sync failing across cluster. Pods terminating with Exit Code 137 under load.\nError Logs: State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-app exceeded memory limit: 512Mi (used: 518Mi)\nConfirmed Root Cause: JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)\nEffective Fix: Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml\nOutcome: Resolved (MTTR: 12 min)\nLesson: Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.; When Inventory Service encounters 'Inventory Service Pods CrashLoopBackOff', verify root cause 'JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)' and apply: 'Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml'.",
+    "symptoms": [
+      "Catalog and stock sync failing across cluster",
+      "Pods terminating with Exit Code 137 under load"
+    ],
+    "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+    "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.",
+    "tags": [
+      "resolved-experience",
+      "critical",
+      "inventory-service",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-251",
+      "title": "Resolved: Inventory Service Pods CrashLoopBackOff",
+      "service": "Inventory Service",
+      "status": "Resolved",
+      "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+      "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+      "resolution_time": "12",
+      "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups."
+    },
+    "created_at": "2026-09-28T14:29:16.008198Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-184",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-249",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Inventory Service",
+    "service": "Inventory Service",
+    "content": "Learned Experience: Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.. Resolved with MTTR of 12m.",
+    "symptoms": [],
+    "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+    "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.",
+    "tags": [
+      "self-learning",
+      "learning-rule",
+      "inventory-service",
+      "memorytype.learning"
+    ],
+    "metadata": {
+      "incident_id": "INC-249",
+      "title": "Learned Rule for Inventory Service",
+      "service": "Inventory Service",
+      "status": "Resolved",
+      "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+      "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+      "resolution_time": "12",
+      "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups."
+    },
+    "created_at": "2026-09-28T14:28:55.705988Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-183",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-249",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Inventory Service Remediation",
+    "service": "Inventory Service",
+    "content": "Operational Pattern for Inventory Service: Observed error signature: 'State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventor...'. Verified fix: 'Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml'. Avoid generic restarts; fix directly targeted the root cause: JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap).",
+    "symptoms": [
+      "Inventory Service",
+      "production-incident"
+    ],
+    "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+    "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.",
+    "tags": [
+      "memorytype.operational",
+      "inventory-service",
+      "sre-playbook",
+      "operational-pattern"
+    ],
+    "metadata": {
+      "incident_id": "INC-249",
+      "title": "SRE Operational Pattern: Inventory Service Remediation",
+      "service": "Inventory Service",
+      "status": "Resolved",
+      "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+      "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+      "resolution_time": "12",
+      "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups."
+    },
+    "created_at": "2026-09-28T14:28:48.319507Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-182",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-249",
+    "memory_type": "Incident",
+    "title": "Resolved: Inventory Service Pods CrashLoopBackOff",
+    "service": "Inventory Service",
+    "content": "Incident INC-249: Inventory Service Pods CrashLoopBackOff\nService: Inventory Service | Severity: Critical\nSymptoms: Catalog and stock sync failing across cluster. Pods terminating with Exit Code 137 under load.\nError Logs: State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-app exceeded memory limit: 512Mi (used: 518Mi)\nConfirmed Root Cause: JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)\nEffective Fix: Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml\nOutcome: Resolved (MTTR: 12 min)\nLesson: Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.; When Inventory Service encounters 'Inventory Service Pods CrashLoopBackOff', verify root cause 'JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)' and apply: 'Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml'.",
+    "symptoms": [
+      "Catalog and stock sync failing across cluster",
+      "Pods terminating with Exit Code 137 under load"
+    ],
+    "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+    "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups.",
+    "tags": [
+      "resolved-experience",
+      "critical",
+      "inventory-service",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-249",
+      "title": "Resolved: Inventory Service Pods CrashLoopBackOff",
+      "service": "Inventory Service",
+      "status": "Resolved",
+      "root_cause": "JVM heap allocation exceeded pod memory cgroup limit (512Mi limit vs 768Mi heap)",
+      "fix_applied": "Increased Kubernetes container memory limit to 1536Mi and added -XX:MaxRAMPercentage=75.0 in deployment yaml",
+      "resolution_time": "12",
+      "lesson": "Exit Code 137 is always Linux kernel OOM killer. Setting MaxRAMPercentage ensures JVM heap scales dynamically with pod cgroups."
+    },
+    "created_at": "2026-09-28T14:28:36.387834Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-181",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-247",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Order Service",
+    "service": "Order Service",
+    "content": "Learned Experience: Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic.. Resolved with MTTR of 12m.",
+    "symptoms": [],
+    "root_cause": "The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.",
+    "fix_applied": "Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic.",
+    "tags": [
+      "self-learning",
+      "learning-rule",
+      "memorytype.learning",
+      "order-service"
+    ],
+    "metadata": {
+      "incident_id": "INC-247",
+      "title": "Learned Rule for Order Service",
+      "service": "Order Service",
+      "status": "Resolved",
+      "root_cause": "The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.",
+      "fix_applied": "Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.",
+      "resolution_time": "12",
+      "lesson": "Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic."
+    },
+    "created_at": "2026-09-28T14:05:29.870023Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-180",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-247",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Order Service Remediation",
+    "service": "Order Service",
+    "content": "Operational Pattern for Order Service: Observed error signature: 'Pod terminated with OOMKilled\nContainer memory usage reached configured limit\nRestart count increasing\nMemory utilizatio...'. Verified fix: 'Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.'. Avoid generic restarts; fix directly targeted the root cause: The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes..",
+    "symptoms": [
+      "Order Service",
+      "production-incident"
+    ],
+    "root_cause": "The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.",
+    "fix_applied": "Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic.",
+    "tags": [
+      "memorytype.operational",
+      "order-service",
+      "sre-playbook",
+      "operational-pattern"
+    ],
+    "metadata": {
+      "incident_id": "INC-247",
+      "title": "SRE Operational Pattern: Order Service Remediation",
+      "service": "Order Service",
+      "status": "Resolved",
+      "root_cause": "The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.",
+      "fix_applied": "Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.",
+      "resolution_time": "12",
+      "lesson": "Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic."
+    },
+    "created_at": "2026-09-28T14:05:25.527816Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-179",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-247",
+    "memory_type": "Incident",
+    "title": "Resolved: Order Service Pods Crashing During Traffic Spike",
+    "service": "Order Service",
+    "content": "Incident INC-247: Order Service Pods Crashing During Traffic Spike\nService: Order Service | Severity: Critical\nSymptoms: Multiple Order Service pods are restarting repeatedly during increased traffic. Users are experiencing slow order processing and some order requests are failing.\nError Logs: Pod terminated with OOMKilled\nContainer memory usage reached configured limit\nRestart count increasing\nMemory utilization: 98%\nTraffic increased by approximately 35%\nApplication logs show increasing request backlog before termination\nConfirmed Root Cause: The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.\nEffective Fix: Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.\nOutcome: Resolved (MTTR: 12 min)\nLesson: Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic.; When Order Service encounters 'Order Service Pods Crashing During Traffic Spike', verify root cause 'The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.' and apply: 'Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.'.",
+    "symptoms": [
+      "Multiple Order Service pods are restarting repeatedly during increased traffic",
+      "Users are experiencing slow order processing and some order requests are failing"
+    ],
+    "root_cause": "The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.",
+    "fix_applied": "Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic.",
+    "tags": [
+      "resolved-experience",
+      "critical",
+      "order-service",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-247",
+      "title": "Resolved: Order Service Pods Crashing During Traffic Spike",
+      "service": "Order Service",
+      "status": "Resolved",
+      "root_cause": "The Order Service container memory limit was too low for the increased request workload, causing the container to exceed its memory limit and be terminated by Kubernetes.",
+      "fix_applied": "Increased the container memory limit from 512Mi to 1Gi and reduced the request batch size to control memory growth.",
+      "resolution_time": "12",
+      "lesson": "Monitor container memory utilization and configure memory limits based on peak workload rather than normal traffic."
+    },
+    "created_at": "2026-09-28T14:05:20.963382Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-178",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-244",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: Check connection pool saturation before restarting application instances.. Resolved with MTTR of 10m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL connection pool exhaustion",
+    "fix_applied": "Increased connection pool from 50 to 100",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 10,
+    "lesson": "Check connection pool saturation before restarting application instances.",
+    "tags": [
+      "self-learning",
+      "memorytype.learning",
+      "learning-rule",
+      "payment-api"
+    ],
+    "metadata": {
+      "incident_id": "INC-244",
+      "title": "Learned Rule for Payment API",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhaustion",
+      "fix_applied": "Increased connection pool from 50 to 100",
+      "resolution_time": "10",
+      "lesson": "Check connection pool saturation before restarting application instances."
+    },
+    "created_at": "2026-09-28T13:46:33.359106Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-177",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-244",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'FATAL: connection pool exhausted (50/50 in use)\nHTTP 503...'. Verified fix: 'Increased connection pool from 50 to 100'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL connection pool exhaustion.",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL connection pool exhaustion",
+    "fix_applied": "Increased connection pool from 50 to 100",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 10,
+    "lesson": "Check connection pool saturation before restarting application instances.",
+    "tags": [
+      "operational-pattern",
+      "memorytype.operational",
+      "sre-playbook",
+      "payment-api"
+    ],
+    "metadata": {
+      "incident_id": "INC-244",
+      "title": "SRE Operational Pattern: Payment API Remediation",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhaustion",
+      "fix_applied": "Increased connection pool from 50 to 100",
+      "resolution_time": "10",
+      "lesson": "Check connection pool saturation before restarting application instances."
+    },
+    "created_at": "2026-09-28T13:46:29.812834Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-176",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-244",
+    "memory_type": "Incident",
+    "title": "Resolved: Payment API Connection Saturation (Test)",
+    "service": "Payment API",
+    "content": "Incident INC-244: Payment API Connection Saturation (Test)\nService: Payment API | Severity: Critical\nSymptoms: Database connection pool saturated during high traffic test.\nError Logs: FATAL: connection pool exhausted (50/50 in use)\nHTTP 503\nConfirmed Root Cause: PostgreSQL connection pool exhaustion\nEffective Fix: Increased connection pool from 50 to 100\nOutcome: Resolved (MTTR: 10 min)\nLesson: Check connection pool saturation before restarting application instances.; When Payment API encounters 'Payment API Connection Saturation (Test)', verify root cause 'PostgreSQL connection pool exhaustion' and apply: 'Increased connection pool from 50 to 100'.",
+    "symptoms": [
+      "Database connection pool saturated during high traffic test"
+    ],
+    "root_cause": "PostgreSQL connection pool exhaustion",
+    "fix_applied": "Increased connection pool from 50 to 100",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 10,
+    "lesson": "Check connection pool saturation before restarting application instances.",
+    "tags": [
+      "resolved-experience",
+      "memorytype.incident",
+      "payment-api",
+      "critical"
+    ],
+    "metadata": {
+      "incident_id": "INC-244",
+      "title": "Resolved: Payment API Connection Saturation (Test)",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhaustion",
+      "fix_applied": "Increased connection pool from 50 to 100",
+      "resolution_time": "10",
+      "lesson": "Check connection pool saturation before restarting application instances."
+    },
+    "created_at": "2026-09-28T13:46:27.142585Z",
+    "live_synced": true
+  },
+  {
+    "id": "MEM-175",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-243",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB.. Resolved with MTTR of 12m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors",
+    "fix_applied": "Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "learning-rule",
+      "memorytype.learning",
+      "self-learning",
+      "payment-api"
+    ],
+    "metadata": {
+      "incident_id": "INC-243",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors",
+      "fix_applied": "Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion",
+      "resolution_time": "12",
+      "lesson": "When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:36:32.285170Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-174",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-243",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'connection pool exhausted\nPostgreSQL timeout\nHTTP 503...'. Verified fix: 'Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors.",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors",
+    "fix_applied": "Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "sre-playbook",
+      "payment-api",
+      "operational-pattern",
+      "memorytype.operational"
+    ],
+    "metadata": {
+      "incident_id": "INC-243",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors",
+      "fix_applied": "Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion",
+      "resolution_time": "12",
+      "lesson": "When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:36:32.270438Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-173",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-243",
+    "memory_type": "Incident",
+    "title": "Resolved: Payment API returning 503 errors",
+    "service": "Payment API",
+    "content": "Incident INC-243: Payment API returning 503 errors\nService: Payment API | Severity: Critical\nSymptoms: Customers are unable to complete checkout. Error rate increased significantly with database connection timeouts.\nError Logs: connection pool exhausted\nPostgreSQL timeout\nHTTP 503\nConfirmed Root Cause: PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors\nEffective Fix: Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion\nOutcome: Resolved (MTTR: 12 min)\nLesson: When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB.; When Payment API encounters 'Payment API returning 503 errors', verify root cause 'PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors' and apply: 'Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion'.",
+    "symptoms": [
+      "Customers are unable to complete checkout",
+      "Error rate increased significantly with database connection timeouts"
+    ],
+    "root_cause": "PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors",
+    "fix_applied": "Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-243",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client connection pool limit (e.g., 50) is too low for current checkout traffic, causing pool exhaustion and timeouts that surface as HTTP 503 errors",
+      "fix_applied": "Query the connection pool metrics (utilization, wait queue length) to confirm exhaustion",
+      "resolution_time": "12",
+      "lesson": "When Payment API encounters '503, timeout, exhausted', inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:36:32.243857Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-172",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-241",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.. Resolved with MTTR of 25m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "learning-rule",
+      "memorytype.learning",
+      "self-learning",
+      "payment-api"
+    ],
+    "metadata": {
+      "incident_id": "INC-241",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T13:30:37.642279Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-171",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-241",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 50...'. Verified fix: 'Increased database connection pool max connections from 50 -> 100 in db config.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "sre-playbook",
+      "payment-api",
+      "operational-pattern",
+      "memorytype.operational"
+    ],
+    "metadata": {
+      "incident_id": "INC-241",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T13:30:37.599416Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-170",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-241",
+    "memory_type": "Incident",
+    "title": "Resolved: Database Connection Pool Exhaustion on Orders DB",
+    "service": "Payment API",
+    "content": "Incident INC-241: Database Connection Pool Exhaustion on Orders DB\nService: Payment API | Severity: Critical\nSymptoms: Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.\nError Logs: ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.\nEffective Fix: Increased database connection pool max connections from 50 -> 100 in db config.\nOutcome: Resolved (MTTR: 25 min)\nLesson: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.; When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'.",
+    "symptoms": [
+      "Checkout service failing with 503 errors",
+      "PostgreSQL connection pool limit hit under spike"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-241",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T13:30:37.587791Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-169",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-240",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.. Resolved with MTTR of 8m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "learning-rule",
+      "memorytype.learning",
+      "self-learning",
+      "payment-api"
+    ],
+    "metadata": {
+      "incident_id": "INC-240",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+      "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+      "resolution_time": "8",
+      "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:30:34.380699Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-168",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-240",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30...'. Verified fix: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL connection pool exhausted under high checkout burst..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "sre-playbook",
+      "payment-api",
+      "operational-pattern",
+      "memorytype.operational"
+    ],
+    "metadata": {
+      "incident_id": "INC-240",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+      "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+      "resolution_time": "8",
+      "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:30:34.373017Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-167",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-240",
+    "memory_type": "Incident",
+    "title": "Resolved: Production API 503 Errors & DB Timeout",
+    "service": "Payment API",
+    "content": "Incident INC-240: Production API 503 Errors & DB Timeout\nService: Payment API | Severity: Critical\nSymptoms: Users are receiving intermittent 503 responses. Database connections are timing out.\nError Logs: ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL connection pool exhausted under high checkout burst.\nEffective Fix: Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.\nOutcome: Resolved (MTTR: 8 min)\nLesson: When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.; When Payment API encounters 'Production API 503 Errors & DB Timeout', verify root cause 'PostgreSQL connection pool exhausted under high checkout burst.' and apply: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'.",
+    "symptoms": [
+      "Users are receiving intermittent 503 responses",
+      "Database connections are timing out"
+    ],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-240",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+      "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+      "resolution_time": "8",
+      "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:30:34.362946Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-166",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-238",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit.. Resolved with MTTR of 12m.",
+    "symptoms": [],
+    "root_cause": "The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.",
+    "fix_applied": "Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit.",
+    "tags": [
+      "learning-rule",
+      "memorytype.learning",
+      "self-learning",
+      "payment-api"
+    ],
+    "metadata": {
+      "incident_id": "INC-238",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.",
+      "fix_applied": "Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.",
+      "resolution_time": "12",
+      "lesson": "Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit."
+    },
+    "created_at": "2026-09-28T13:20:25.274868Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-165",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-238",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'HTTP 503 Service Unavailable\nPaymentRequest failed\nPostgreSQL connection pool exhausted\nTimeout waiting for database con...'. Verified fix: 'Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.'. Avoid generic restarts; fix directly targeted the root cause: The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.",
+    "fix_applied": "Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit.",
+    "tags": [
+      "sre-playbook",
+      "payment-api",
+      "operational-pattern",
+      "memorytype.operational"
+    ],
+    "metadata": {
+      "incident_id": "INC-238",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.",
+      "fix_applied": "Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.",
+      "resolution_time": "12",
+      "lesson": "Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit."
+    },
+    "created_at": "2026-09-28T13:20:25.260699Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-164",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-238",
+    "memory_type": "Incident",
+    "title": "Resolved: Payment API 503 During Peak Traffic",
+    "service": "Payment API",
+    "content": "Incident INC-238: Payment API 503 During Peak Traffic\nService: Payment API | Severity: Critical\nSymptoms: Customers are unable to complete payments during peak traffic. The Payment API is returning HTTP 503 errors intermittently, causing checkout failures and failed transactions.\nError Logs: HTTP 503 Service Unavailable\nPaymentRequest failed\nPostgreSQL connection pool exhausted\nTimeout waiting for database connection\nActive connections: 50/50\nCheckout traffic increased by 40%\nConfirmed Root Cause: The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.\nEffective Fix: Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.\nOutcome: Resolved (MTTR: 12 min)\nLesson: Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit.; When Payment API encounters 'Payment API 503 During Peak Traffic', verify root cause 'The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.' and apply: 'Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.'.",
+    "symptoms": [
+      "Customers are unable to complete payments during peak traffic",
+      "The Payment API is returning HTTP 503 errors intermittently, causing checkout failures and failed transactions"
+    ],
+    "root_cause": "The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.",
+    "fix_applied": "Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-238",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "The PostgreSQL client connection pool was limited to 50 connections, which was insufficient for the 40% increase in concurrent checkout traffic.",
+      "fix_applied": "Increased the PostgreSQL client connection pool from 50 to 100 and restarted the affected Payment API service.",
+      "resolution_time": "12",
+      "lesson": "Monitor database connection pool utilization during traffic spikes and increase capacity before the pool reaches its maximum limit."
+    },
+    "created_at": "2026-09-28T13:20:25.226346Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-163",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-236",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.. Resolved with MTTR of 25m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "learning-rule",
+      "memorytype.learning",
+      "self-learning",
+      "payment-api"
+    ],
+    "metadata": {
+      "incident_id": "INC-236",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T13:12:56.268612Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-162",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-236",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 50...'. Verified fix: 'Increased database connection pool max connections from 50 -> 100 in db config.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "sre-playbook",
+      "payment-api",
+      "operational-pattern",
+      "memorytype.operational"
+    ],
+    "metadata": {
+      "incident_id": "INC-236",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T13:12:56.259953Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-161",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-236",
+    "memory_type": "Incident",
+    "title": "Resolved: Database Connection Pool Exhaustion on Orders DB",
+    "service": "Payment API",
+    "content": "Incident INC-236: Database Connection Pool Exhaustion on Orders DB\nService: Payment API | Severity: Critical\nSymptoms: Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.\nError Logs: ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.\nEffective Fix: Increased database connection pool max connections from 50 -> 100 in db config.\nOutcome: Resolved (MTTR: 25 min)\nLesson: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.; When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'.",
+    "symptoms": [
+      "Checkout service failing with 503 errors",
+      "PostgreSQL connection pool limit hit under spike"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-236",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+      "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+      "resolution_time": "25",
+      "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot."
+    },
+    "created_at": "2026-09-28T13:12:56.251460Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-160",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-235",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.. Resolved with MTTR of 8m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "learning-rule",
+      "memorytype.learning",
+      "self-learning",
+      "payment-api"
+    ],
+    "metadata": {
+      "incident_id": "INC-235",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+      "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+      "resolution_time": "8",
+      "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:12:55.258464Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-159",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-235",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30...'. Verified fix: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL connection pool exhausted under high checkout burst..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "sre-playbook",
+      "payment-api",
+      "operational-pattern",
+      "memorytype.operational"
+    ],
+    "metadata": {
+      "incident_id": "INC-235",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+      "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+      "resolution_time": "8",
+      "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:12:55.248806Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-158",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-235",
+    "memory_type": "Incident",
+    "title": "Resolved: Production API 503 Errors & DB Timeout",
+    "service": "Payment API",
+    "content": "Incident INC-235: Production API 503 Errors & DB Timeout\nService: Payment API | Severity: Critical\nSymptoms: Users are receiving intermittent 503 responses. Database connections are timing out.\nError Logs: ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL connection pool exhausted under high checkout burst.\nEffective Fix: Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.\nOutcome: Resolved (MTTR: 8 min)\nLesson: When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.; When Payment API encounters 'Production API 503 Errors & DB Timeout', verify root cause 'PostgreSQL connection pool exhausted under high checkout burst.' and apply: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'.",
+    "symptoms": [
+      "Users are receiving intermittent 503 responses",
+      "Database connections are timing out"
+    ],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical",
+      "memorytype.incident"
+    ],
+    "metadata": {
+      "incident_id": "INC-235",
+      "service": "Payment API",
+      "status": "Resolved",
+      "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+      "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+      "resolution_time": "8",
+      "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB."
+    },
+    "created_at": "2026-09-28T13:12:55.239186Z",
+    "live_synced": false
+  },
+  {
+    "id": "MEM-157",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-233",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.. Resolved with MTTR of 25m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "learning-rule",
+      "self-learning"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T13:04:21.221122Z"
+  },
+  {
+    "id": "MEM-156",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-233",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 50...'. Verified fix: 'Increased database connection pool max connections from 50 -> 100 in db config.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "operational-pattern",
+      "sre-playbook"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T13:04:21.215181Z"
+  },
+  {
+    "id": "MEM-155",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-233",
+    "memory_type": "Incident",
+    "title": "Resolved: Database Connection Pool Exhaustion on Orders DB",
+    "service": "Payment API",
+    "content": "Incident INC-233: Database Connection Pool Exhaustion on Orders DB\nService: Payment API | Severity: Critical\nSymptoms: Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.\nError Logs: ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.\nEffective Fix: Increased database connection pool max connections from 50 -> 100 in db config.\nOutcome: Resolved (MTTR: 25 min)\nLesson: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.; When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'.",
+    "symptoms": [
+      "Checkout service failing with 503 errors",
+      "PostgreSQL connection pool limit hit under spike"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T13:04:21.210874Z"
+  },
+  {
+    "id": "MEM-154",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-232",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.. Resolved with MTTR of 8m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "learning-rule",
+      "self-learning"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T13:04:18.191103Z"
+  },
+  {
+    "id": "MEM-153",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-232",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30...'. Verified fix: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL connection pool exhausted under high checkout burst..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "operational-pattern",
+      "sre-playbook"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T13:04:18.185119Z"
+  },
+  {
+    "id": "MEM-152",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-232",
+    "memory_type": "Incident",
+    "title": "Resolved: Production API 503 Errors & DB Timeout",
+    "service": "Payment API",
+    "content": "Incident INC-232: Production API 503 Errors & DB Timeout\nService: Payment API | Severity: Critical\nSymptoms: Users are receiving intermittent 503 responses. Database connections are timing out.\nError Logs: ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL connection pool exhausted under high checkout burst.\nEffective Fix: Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.\nOutcome: Resolved (MTTR: 8 min)\nLesson: When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.; When Payment API encounters 'Production API 503 Errors & DB Timeout', verify root cause 'PostgreSQL connection pool exhausted under high checkout burst.' and apply: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'.",
+    "symptoms": [
+      "Users are receiving intermittent 503 responses",
+      "Database connections are timing out"
+    ],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T13:04:18.162250Z"
+  },
+  {
+    "id": "MEM-151",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-226",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.. Resolved with MTTR of 25m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "learning-rule",
+      "self-learning"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:44:06.319343Z"
+  },
+  {
+    "id": "MEM-150",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-226",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 50...'. Verified fix: 'Increased database connection pool max connections from 50 -> 100 in db config.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "operational-pattern",
+      "sre-playbook"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:44:06.312303Z"
+  },
+  {
+    "id": "MEM-149",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-226",
+    "memory_type": "Incident",
+    "title": "Resolved: Database Connection Pool Exhaustion on Orders DB",
+    "service": "Payment API",
+    "content": "Incident INC-226: Database Connection Pool Exhaustion on Orders DB\nService: Payment API | Severity: Critical\nSymptoms: Checkout service failing with 503 errors. PostgreSQL connection pool limit hit under spike.\nError Logs: ERROR: [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL: database timeout after 30000ms\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.\nEffective Fix: Increased database connection pool max connections from 50 -> 100 in db config.\nOutcome: Resolved (MTTR: 25 min)\nLesson: Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.; When Payment API encounters 'Database Connection Pool Exhaustion on Orders DB', verify root cause 'PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.' and apply: 'Increased database connection pool max connections from 50 -> 100 in db config.'.",
+    "symptoms": [
+      "Checkout service failing with 503 errors",
+      "PostgreSQL connection pool limit hit under spike"
+    ],
+    "root_cause": "PostgreSQL client pool limit (50) was lower than peak concurrent checkout traffic.",
+    "fix_applied": "Increased database connection pool max connections from 50 -> 100 in db config.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 25,
+    "lesson": "Payment API 503 timeouts under load are fixed by tuning client pool size rather than DB engine reboot.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:44:06.303756Z"
+  },
+  {
+    "id": "MEM-148",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-225",
+    "memory_type": "Learning",
+    "title": "Learned Rule for Payment API",
+    "service": "Payment API",
+    "content": "Learned Experience: When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.. Resolved with MTTR of 8m.",
+    "symptoms": [],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "learning-rule",
+      "self-learning"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:44:06.254580Z"
+  },
+  {
+    "id": "MEM-147",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-225",
+    "memory_type": "Operational",
+    "title": "SRE Operational Pattern: Payment API Remediation",
+    "service": "Payment API",
+    "content": "Operational Pattern for Payment API: Observed error signature: 'ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30...'. Verified fix: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'. Avoid generic restarts; fix directly targeted the root cause: PostgreSQL connection pool exhausted under high checkout burst..",
+    "symptoms": [
+      "Payment API",
+      "production-incident"
+    ],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "operational-pattern",
+      "sre-playbook"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:44:06.245693Z"
+  },
+  {
+    "id": "MEM-146",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-225",
+    "memory_type": "Incident",
+    "title": "Resolved: Production API 503 Errors & DB Timeout",
+    "service": "Payment API",
+    "content": "Incident INC-225: Production API 503 Errors & DB Timeout\nService: Payment API | Severity: Critical\nSymptoms: Users are receiving intermittent 503 responses. Database connections are timing out.\nError Logs: ERROR [pool-manager] connection pool exhausted (50/50 connections active)\nFATAL [checkout-svc] database timeout after 30s\nHTTP 503 Service Unavailable\nConfirmed Root Cause: PostgreSQL connection pool exhausted under high checkout burst.\nEffective Fix: Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.\nOutcome: Resolved (MTTR: 8 min)\nLesson: When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.; When Payment API encounters 'Production API 503 Errors & DB Timeout', verify root cause 'PostgreSQL connection pool exhausted under high checkout burst.' and apply: 'Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.'.",
+    "symptoms": [
+      "Users are receiving intermittent 503 responses",
+      "Database connections are timing out"
+    ],
+    "root_cause": "PostgreSQL connection pool exhausted under high checkout burst.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and restarted pool supervisor.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "When Payment API returns 503 with pool timeout, inspect connection pool capacity before rebooting DB.",
+    "tags": [
+      "resolved-experience",
+      "payment-api",
+      "critical"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:44:06.170973Z"
+  },
+  {
+    "id": "MEM-145",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-203",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Catalog Service Troubleshooting",
+    "service": "Catalog Service",
+    "content": "Learned SRE Rule for Catalog Service: Redis single-threaded architecture cannot handle >100k requests/sec to a single hot key.. Past Fix: Enabled in-process L1 Caffeine cache with 5-second TTL on catalog microservices and replicated hot key across Redis read replicas..",
+    "symptoms": [
+      "Redis 100% CPU",
+      "Hot key",
+      "Catalog latency spike",
+      "MGET saturation"
+    ],
+    "root_cause": "Single Redis key receiving 180,000 reads/sec without local in-memory L1 cache on frontend instances.",
+    "fix_applied": "Enabled in-process L1 Caffeine cache with 5-second TTL on catalog microservices and replicated hot key across Redis read replicas.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 14,
+    "lesson": "Redis single-threaded architecture cannot handle >100k requests/sec to a single hot key.",
+    "tags": [
+      "database",
+      "redis",
+      "caching",
+      "catalog",
+      "performance"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:34:04.978105Z"
+  },
+  {
+    "id": "MEM-144",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-203",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Catalog Service - Redis 100% CPU",
+    "service": "Catalog Service",
+    "content": "Operational Pattern on Catalog Service: When encountering symptoms like Redis 100% CPU, Hot key, Catalog latency spike, MGET saturation, the root cause is frequently Single Redis key receiving 180,000 reads/sec without local in-memory L1 cache on frontend instances.. Effective remediation: Enabled in-process L1 Caffeine cache with 5-second TTL on catalog microservices and replicated hot key across Redis read replicas..",
+    "symptoms": [
+      "Redis 100% CPU",
+      "Hot key",
+      "Catalog latency spike",
+      "MGET saturation"
+    ],
+    "root_cause": "Single Redis key receiving 180,000 reads/sec without local in-memory L1 cache on frontend instances.",
+    "fix_applied": "Enabled in-process L1 Caffeine cache with 5-second TTL on catalog microservices and replicated hot key across Redis read replicas.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 14,
+    "lesson": "Redis single-threaded architecture cannot handle >100k requests/sec to a single hot key.",
+    "tags": [
+      "database",
+      "redis",
+      "caching",
+      "catalog",
+      "performance"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:34:02.661109Z"
+  },
+  {
+    "id": "MEM-143",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-203",
+    "memory_type": "Incident",
+    "title": "Redis Master 100% CPU on Flash Sale Product Cache Key",
+    "service": "Catalog Service",
+    "content": "Incident INC-203: Redis Master 100% CPU on Flash Sale Product Cache Key\nDescription: Redis single-threaded master pinned at 100% CPU. Catalog page load latency escalated to 8.5s.\nLogs excerpt: WARN [redis-monitor] Engine CPU: 99.9%\nHot key detected: 'product:sku:99812-flash-sale' requested 180,000 ops/sec\nCommand: MGET product:sku:99812-flash-sale:details product:sku:99812-flash-sale:inventory\nRoot Cause: Single Redis key receiving 180,000 reads/sec without local in-memory L1 cache on frontend instances.\nResolution Fix: Enabled in-process L1 Caffeine cache with 5-second TTL on catalog microservices and replicated hot key across Redis read replicas.\nOutcome: Resolved",
+    "symptoms": [
+      "Redis 100% CPU",
+      "Hot key",
+      "Catalog latency spike",
+      "MGET saturation"
+    ],
+    "root_cause": "Single Redis key receiving 180,000 reads/sec without local in-memory L1 cache on frontend instances.",
+    "fix_applied": "Enabled in-process L1 Caffeine cache with 5-second TTL on catalog microservices and replicated hot key across Redis read replicas.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 14,
+    "lesson": "Redis single-threaded architecture cannot handle >100k requests/sec to a single hot key.; Use client-side L1 micro-caching (5-10s TTL) to absorb flash sale hot key spikes.",
+    "tags": [
+      "database",
+      "redis",
+      "caching",
+      "catalog",
+      "performance"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:34:00.357473Z"
+  },
+  {
+    "id": "MEM-142",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-198",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Storage Service Troubleshooting",
+    "service": "Storage Service",
+    "content": "Learned SRE Rule for Storage Service: Docker and Kubernetes pods using host networking can access IMDSv2 with hop limit 1, but bridge networking requires hop limit 2.. Past Fix: Updated EC2 Launch Template `HttpPutResponseHopLimit` from 1 -> 2 via AWS CLI and refreshed instance metadata..",
+    "symptoms": [
+      "IMDSv2 401",
+      "Hop limit exceeded",
+      "CredentialsProviderError",
+      "S3 403"
+    ],
+    "root_cause": "Containerized workloads in bridge networking required IMDSv2 metadata hop limit = 2 (was set to default 1).",
+    "fix_applied": "Updated EC2 Launch Template `HttpPutResponseHopLimit` from 1 -> 2 via AWS CLI and refreshed instance metadata.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 10,
+    "lesson": "Docker and Kubernetes pods using host networking can access IMDSv2 with hop limit 1, but bridge networking requires hop limit 2.",
+    "tags": [
+      "infrastructure",
+      "aws",
+      "security",
+      "s3",
+      "cloud"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:58.062285Z"
+  },
+  {
+    "id": "MEM-141",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-198",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Storage Service - IMDSv2 401",
+    "service": "Storage Service",
+    "content": "Operational Pattern on Storage Service: When encountering symptoms like IMDSv2 401, Hop limit exceeded, CredentialsProviderError, S3 403, the root cause is frequently Containerized workloads in bridge networking required IMDSv2 metadata hop limit = 2 (was set to default 1).. Effective remediation: Updated EC2 Launch Template `HttpPutResponseHopLimit` from 1 -> 2 via AWS CLI and refreshed instance metadata..",
+    "symptoms": [
+      "IMDSv2 401",
+      "Hop limit exceeded",
+      "CredentialsProviderError",
+      "S3 403"
+    ],
+    "root_cause": "Containerized workloads in bridge networking required IMDSv2 metadata hop limit = 2 (was set to default 1).",
+    "fix_applied": "Updated EC2 Launch Template `HttpPutResponseHopLimit` from 1 -> 2 via AWS CLI and refreshed instance metadata.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 10,
+    "lesson": "Docker and Kubernetes pods using host networking can access IMDSv2 with hop limit 1, but bridge networking requires hop limit 2.",
+    "tags": [
+      "infrastructure",
+      "aws",
+      "security",
+      "s3",
+      "cloud"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:55.763704Z"
+  },
+  {
+    "id": "MEM-140",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-198",
+    "memory_type": "Incident",
+    "title": "AWS SDK Metadata Token Expiration Failures (IAM Role Access)",
+    "service": "Storage Service",
+    "content": "Incident INC-198: AWS SDK Metadata Token Expiration Failures (IAM Role Access)\nDescription: S3 upload operations failing with 403 Forbidden across all worker nodes simultaneously.\nLogs excerpt: ERROR [aws-sdk] Unable to load credentials from EC2 Metadata Service: HTTP 401 Unauthorized\nPUT http://169.254.169.254/latest/api/token - Hop limit exceeded\nS3 Upload failed: CredentialsProviderError\nRoot Cause: Containerized workloads in bridge networking required IMDSv2 metadata hop limit = 2 (was set to default 1).\nResolution Fix: Updated EC2 Launch Template `HttpPutResponseHopLimit` from 1 -> 2 via AWS CLI and refreshed instance metadata.\nOutcome: Resolved",
+    "symptoms": [
+      "IMDSv2 401",
+      "Hop limit exceeded",
+      "CredentialsProviderError",
+      "S3 403"
+    ],
+    "root_cause": "Containerized workloads in bridge networking required IMDSv2 metadata hop limit = 2 (was set to default 1).",
+    "fix_applied": "Updated EC2 Launch Template `HttpPutResponseHopLimit` from 1 -> 2 via AWS CLI and refreshed instance metadata.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 10,
+    "lesson": "Docker and Kubernetes pods using host networking can access IMDSv2 with hop limit 1, but bridge networking requires hop limit 2.; S3 403 / CredentialsProviderError on EC2 is usually IMDS hop limit exhaustion.",
+    "tags": [
+      "infrastructure",
+      "aws",
+      "security",
+      "s3",
+      "cloud"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:53.467185Z"
+  },
+  {
+    "id": "MEM-139",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-192",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Order Processing Troubleshooting",
+    "service": "Order Processing",
+    "content": "Learned SRE Rule for Order Processing: Consumer group rebalance storms occur when message processing exceeds `max.poll.interval.ms`.. Past Fix: Increased max.poll.interval.ms to 300000ms and offloaded fraud check to asynchronous background thread pool..",
+    "symptoms": [
+      "Kafka rebalance",
+      "Heartbeat timeout",
+      "consumer lag spike",
+      "max.poll.interval.ms exceeded"
+    ],
+    "root_cause": "Heavy third-party fraud check API call inside consumer loop blocked message processing beyond max.poll.interval.ms.",
+    "fix_applied": "Increased max.poll.interval.ms to 300000ms and offloaded fraud check to asynchronous background thread pool.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 17,
+    "lesson": "Consumer group rebalance storms occur when message processing exceeds `max.poll.interval.ms`.",
+    "tags": [
+      "infrastructure",
+      "kafka",
+      "streaming",
+      "consumer-group",
+      "orders"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:51.178080Z"
+  },
+  {
+    "id": "MEM-138",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-192",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Order Processing - Kafka rebalance",
+    "service": "Order Processing",
+    "content": "Operational Pattern on Order Processing: When encountering symptoms like Kafka rebalance, Heartbeat timeout, consumer lag spike, max.poll.interval.ms exceeded, the root cause is frequently Heavy third-party fraud check API call inside consumer loop blocked message processing beyond max.poll.interval.ms.. Effective remediation: Increased max.poll.interval.ms to 300000ms and offloaded fraud check to asynchronous background thread pool..",
+    "symptoms": [
+      "Kafka rebalance",
+      "Heartbeat timeout",
+      "consumer lag spike",
+      "max.poll.interval.ms exceeded"
+    ],
+    "root_cause": "Heavy third-party fraud check API call inside consumer loop blocked message processing beyond max.poll.interval.ms.",
+    "fix_applied": "Increased max.poll.interval.ms to 300000ms and offloaded fraud check to asynchronous background thread pool.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 17,
+    "lesson": "Consumer group rebalance storms occur when message processing exceeds `max.poll.interval.ms`.",
+    "tags": [
+      "infrastructure",
+      "kafka",
+      "streaming",
+      "consumer-group",
+      "orders"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:48.877821Z"
+  },
+  {
+    "id": "MEM-137",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-192",
+    "memory_type": "Incident",
+    "title": "Kafka Consumer Group Rebalance Storm on Order Processing",
+    "service": "Order Processing",
+    "content": "Incident INC-192: Kafka Consumer Group Rebalance Storm on Order Processing\nDescription: Order processing lag increasing exponentially. Consumers constantly leaving and re-joining consumer group.\nLogs excerpt: WARN [consumer-coordinator] Revoking previously assigned partitions for group order-processors\nHeartbeat timeout expired (max.poll.interval.ms: 30000 exceeded, elapsed: 48200ms)\nInitiating rebalance (generation 412 -> 413)\nRoot Cause: Heavy third-party fraud check API call inside consumer loop blocked message processing beyond max.poll.interval.ms.\nResolution Fix: Increased max.poll.interval.ms to 300000ms and offloaded fraud check to asynchronous background thread pool.\nOutcome: Resolved",
+    "symptoms": [
+      "Kafka rebalance",
+      "Heartbeat timeout",
+      "consumer lag spike",
+      "max.poll.interval.ms exceeded"
+    ],
+    "root_cause": "Heavy third-party fraud check API call inside consumer loop blocked message processing beyond max.poll.interval.ms.",
+    "fix_applied": "Increased max.poll.interval.ms to 300000ms and offloaded fraud check to asynchronous background thread pool.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 17,
+    "lesson": "Consumer group rebalance storms occur when message processing exceeds `max.poll.interval.ms`.; Never perform synchronous blocking I/O calls directly within the Kafka consumer poll loop.",
+    "tags": [
+      "infrastructure",
+      "kafka",
+      "streaming",
+      "consumer-group",
+      "orders"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:46.571070Z"
+  },
+  {
+    "id": "MEM-136",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-185",
+    "memory_type": "Learning",
+    "title": "Learned Rule: GraphQL Gateway Troubleshooting",
+    "service": "GraphQL Gateway",
+    "content": "Learned SRE Rule for GraphQL Gateway: All public GraphQL endpoints must enforce strict query depth (max 6) and query complexity analysis limits.. Past Fix: Configured GraphQL max query depth limit = 6 and cost analysis limiter in Apollo Gateway middleware..",
+    "symptoms": [
+      "thread pool starvation",
+      "latency surge",
+      "nested query depth",
+      "HTTP 504"
+    ],
+    "root_cause": "Malicious or unoptimized deeply nested circular GraphQL query executed without depth and complexity limiting.",
+    "fix_applied": "Configured GraphQL max query depth limit = 6 and cost analysis limiter in Apollo Gateway middleware.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 13,
+    "lesson": "All public GraphQL endpoints must enforce strict query depth (max 6) and query complexity analysis limits.",
+    "tags": [
+      "api",
+      "graphql",
+      "performance",
+      "gateway",
+      "thread-exhaustion"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:44.269073Z"
+  },
+  {
+    "id": "MEM-135",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-185",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: GraphQL Gateway - thread pool starvation",
+    "service": "GraphQL Gateway",
+    "content": "Operational Pattern on GraphQL Gateway: When encountering symptoms like thread pool starvation, latency surge, nested query depth, HTTP 504, the root cause is frequently Malicious or unoptimized deeply nested circular GraphQL query executed without depth and complexity limiting.. Effective remediation: Configured GraphQL max query depth limit = 6 and cost analysis limiter in Apollo Gateway middleware..",
+    "symptoms": [
+      "thread pool starvation",
+      "latency surge",
+      "nested query depth",
+      "HTTP 504"
+    ],
+    "root_cause": "Malicious or unoptimized deeply nested circular GraphQL query executed without depth and complexity limiting.",
+    "fix_applied": "Configured GraphQL max query depth limit = 6 and cost analysis limiter in Apollo Gateway middleware.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 13,
+    "lesson": "All public GraphQL endpoints must enforce strict query depth (max 6) and query complexity analysis limits.",
+    "tags": [
+      "api",
+      "graphql",
+      "performance",
+      "gateway",
+      "thread-exhaustion"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:41.956282Z"
+  },
+  {
+    "id": "MEM-134",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-185",
+    "memory_type": "Incident",
+    "title": "GraphQL Gateway Latency Surge (Thread Pool Starvation)",
+    "service": "GraphQL Gateway",
+    "content": "Incident INC-185: GraphQL Gateway Latency Surge (Thread Pool Starvation)\nDescription: GraphQL gateway response time spiked from 45ms to 12,000ms. Worker threads exhausted.\nLogs excerpt: WARN [thread-pool] Active worker threads: 200/200 (queue backlog: 1,420)\nNested query detected: depth 14 on query { user { friends { friends { orders { items ... } } } } }\nMemory utilization: 94%\nRoot Cause: Malicious or unoptimized deeply nested circular GraphQL query executed without depth and complexity limiting.\nResolution Fix: Configured GraphQL max query depth limit = 6 and cost analysis limiter in Apollo Gateway middleware.\nOutcome: Resolved",
+    "symptoms": [
+      "thread pool starvation",
+      "latency surge",
+      "nested query depth",
+      "HTTP 504"
+    ],
+    "root_cause": "Malicious or unoptimized deeply nested circular GraphQL query executed without depth and complexity limiting.",
+    "fix_applied": "Configured GraphQL max query depth limit = 6 and cost analysis limiter in Apollo Gateway middleware.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 13,
+    "lesson": "All public GraphQL endpoints must enforce strict query depth (max 6) and query complexity analysis limits.; Thread starvation with high queue backlog is typically caused by unconstrained recursive resolver queries.",
+    "tags": [
+      "api",
+      "graphql",
+      "performance",
+      "gateway",
+      "thread-exhaustion"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:39.630164Z"
+  },
+  {
+    "id": "MEM-133",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-179",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Notification Service Troubleshooting",
+    "service": "Notification Service",
+    "content": "Learned SRE Rule for Notification Service: Connection refused on non-standard ports indicates environment variable config typo.. Past Fix: Corrected REDIS_PORT value to 6379 in Kubernetes ConfigMap and performed rolling restart..",
+    "symptoms": [
+      "connection refused",
+      "CrashLoopBackOff",
+      "port typo",
+      "config error"
+    ],
+    "root_cause": "Typo in Helm values.yaml configmap: `REDIS_PORT: 63799` instead of standard `6379`.",
+    "fix_applied": "Corrected REDIS_PORT value to 6379 in Kubernetes ConfigMap and performed rolling restart.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 5,
+    "lesson": "Connection refused on non-standard ports indicates environment variable config typo.",
+    "tags": [
+      "deployment",
+      "config",
+      "kubernetes",
+      "notification-service",
+      "redis"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:37.331683Z"
+  },
+  {
+    "id": "MEM-132",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-179",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Notification Service - connection refused",
+    "service": "Notification Service",
+    "content": "Operational Pattern on Notification Service: When encountering symptoms like connection refused, CrashLoopBackOff, port typo, config error, the root cause is frequently Typo in Helm values.yaml configmap: `REDIS_PORT: 63799` instead of standard `6379`.. Effective remediation: Corrected REDIS_PORT value to 6379 in Kubernetes ConfigMap and performed rolling restart..",
+    "symptoms": [
+      "connection refused",
+      "CrashLoopBackOff",
+      "port typo",
+      "config error"
+    ],
+    "root_cause": "Typo in Helm values.yaml configmap: `REDIS_PORT: 63799` instead of standard `6379`.",
+    "fix_applied": "Corrected REDIS_PORT value to 6379 in Kubernetes ConfigMap and performed rolling restart.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 5,
+    "lesson": "Connection refused on non-standard ports indicates environment variable config typo.",
+    "tags": [
+      "deployment",
+      "config",
+      "kubernetes",
+      "notification-service",
+      "redis"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:35.030362Z"
+  },
+  {
+    "id": "MEM-131",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-179",
+    "memory_type": "Incident",
+    "title": "Notification Service Crash On Boot (Connection Refused)",
+    "service": "Notification Service",
+    "content": "Incident INC-179: Notification Service Crash On Boot (Connection Refused)\nDescription: Newly deployed notification service pods entering CrashLoopBackOff immediately after deployment.\nLogs excerpt: FATAL [main] Failed to connect to Redis queue broker at redis-cluster.internal:63799\nError: dial tcp: connection refused on port 63799\nConfig dump: REDIS_PORT=63799 (Expected: 6379)\nRoot Cause: Typo in Helm values.yaml configmap: `REDIS_PORT: 63799` instead of standard `6379`.\nResolution Fix: Corrected REDIS_PORT value to 6379 in Kubernetes ConfigMap and performed rolling restart.\nOutcome: Resolved",
+    "symptoms": [
+      "connection refused",
+      "CrashLoopBackOff",
+      "port typo",
+      "config error"
+    ],
+    "root_cause": "Typo in Helm values.yaml configmap: `REDIS_PORT: 63799` instead of standard `6379`.",
+    "fix_applied": "Corrected REDIS_PORT value to 6379 in Kubernetes ConfigMap and performed rolling restart.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 5,
+    "lesson": "Connection refused on non-standard ports indicates environment variable config typo.; Implement ConfigMap schema validation in CI pre-commit checks.",
+    "tags": [
+      "deployment",
+      "config",
+      "kubernetes",
+      "notification-service",
+      "redis"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:32.721633Z"
+  },
+  {
+    "id": "MEM-130",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-173",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Billing Service Troubleshooting",
+    "service": "Billing Service",
+    "content": "Learned SRE Rule for Billing Service: Never perform destructive or non-backwards-compatible schema changes in single deployment steps.. Past Fix: Manually triggered Flyway migration step `V2_41__add_currency_code.sql` and updated CI/CD pipeline gate to verify migration health before pod rollout..",
+    "symptoms": [
+      "column does not exist",
+      "post-release 500",
+      "migration missing",
+      "Flyway"
+    ],
+    "root_cause": "Blue/green deployment activated new v2.41 application pods before Flyway DB migration step finished executing on RDS.",
+    "fix_applied": "Manually triggered Flyway migration step `V2_41__add_currency_code.sql` and updated CI/CD pipeline gate to verify migration health before pod rollout.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 7,
+    "lesson": "Never perform destructive or non-backwards-compatible schema changes in single deployment steps.",
+    "tags": [
+      "deployment",
+      "schema-migration",
+      "billing",
+      "flyway",
+      "release"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:30.394651Z"
+  },
+  {
+    "id": "MEM-129",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-173",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Billing Service - column does not exist",
+    "service": "Billing Service",
+    "content": "Operational Pattern on Billing Service: When encountering symptoms like column does not exist, post-release 500, migration missing, Flyway, the root cause is frequently Blue/green deployment activated new v2.41 application pods before Flyway DB migration step finished executing on RDS.. Effective remediation: Manually triggered Flyway migration step `V2_41__add_currency_code.sql` and updated CI/CD pipeline gate to verify migration health before pod rollout..",
+    "symptoms": [
+      "column does not exist",
+      "post-release 500",
+      "migration missing",
+      "Flyway"
+    ],
+    "root_cause": "Blue/green deployment activated new v2.41 application pods before Flyway DB migration step finished executing on RDS.",
+    "fix_applied": "Manually triggered Flyway migration step `V2_41__add_currency_code.sql` and updated CI/CD pipeline gate to verify migration health before pod rollout.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 7,
+    "lesson": "Never perform destructive or non-backwards-compatible schema changes in single deployment steps.",
+    "tags": [
+      "deployment",
+      "schema-migration",
+      "billing",
+      "flyway",
+      "release"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:28.104590Z"
+  },
+  {
+    "id": "MEM-128",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-173",
+    "memory_type": "Incident",
+    "title": "500 Errors Post-Release: Column 'currency_code' Does Not Exist",
+    "service": "Billing Service",
+    "content": "Incident INC-173: 500 Errors Post-Release: Column 'currency_code' Does Not Exist\nDescription: Immediately following v2.41 release, 100% of billing invoice generation endpoints throwing 500 exceptions.\nLogs excerpt: ERROR [invoice-generator] column invoices.currency_code does not exist\nLINE 1: SELECT id, amount, currency_code FROM invoices WHERE id = $1\nRelease tag: release-v2.41.0 deployed at 18:00:00 UTC\nRoot Cause: Blue/green deployment activated new v2.41 application pods before Flyway DB migration step finished executing on RDS.\nResolution Fix: Manually triggered Flyway migration step `V2_41__add_currency_code.sql` and updated CI/CD pipeline gate to verify migration health before pod rollout.\nOutcome: Resolved",
+    "symptoms": [
+      "column does not exist",
+      "post-release 500",
+      "migration missing",
+      "Flyway"
+    ],
+    "root_cause": "Blue/green deployment activated new v2.41 application pods before Flyway DB migration step finished executing on RDS.",
+    "fix_applied": "Manually triggered Flyway migration step `V2_41__add_currency_code.sql` and updated CI/CD pipeline gate to verify migration health before pod rollout.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 7,
+    "lesson": "Never perform destructive or non-backwards-compatible schema changes in single deployment steps.; Use Expand-and-Contract database migration pattern: (1) Add nullable column, (2) Deploy code reading column, (3) Apply NOT NULL constraint.",
+    "tags": [
+      "deployment",
+      "schema-migration",
+      "billing",
+      "flyway",
+      "release"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:25.817481Z"
+  },
+  {
+    "id": "MEM-127",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-168",
+    "memory_type": "Learning",
+    "title": "Learned Rule: CoreDNS Troubleshooting",
+    "service": "CoreDNS",
+    "content": "Learned SRE Rule for CoreDNS: Cluster-wide random connection timeouts are frequently CoreDNS CPU starvation rather than target service failure.. Past Fix: Scaled CoreDNS deployment from 2 -> 8 replicas and enabled NodeLocal DNSCache daemonset across all worker nodes..",
+    "symptoms": [
+      "lookup timeout",
+      "dial tcp lookup i/o timeout",
+      "CoreDNS CPU throttling",
+      "DNS failure"
+    ],
+    "root_cause": "CoreDNS deployment was underscaled (only 2 replicas) handling 40,000 queries/sec with strict 100m CPU limit causing kernel CFS throttling.",
+    "fix_applied": "Scaled CoreDNS deployment from 2 -> 8 replicas and enabled NodeLocal DNSCache daemonset across all worker nodes.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 16,
+    "lesson": "Cluster-wide random connection timeouts are frequently CoreDNS CPU starvation rather than target service failure.",
+    "tags": [
+      "infrastructure",
+      "kubernetes",
+      "dns",
+      "coredns",
+      "networking"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:23.528379Z"
+  },
+  {
+    "id": "MEM-126",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-168",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: CoreDNS - lookup timeout",
+    "service": "CoreDNS",
+    "content": "Operational Pattern on CoreDNS: When encountering symptoms like lookup timeout, dial tcp lookup i/o timeout, CoreDNS CPU throttling, DNS failure, the root cause is frequently CoreDNS deployment was underscaled (only 2 replicas) handling 40,000 queries/sec with strict 100m CPU limit causing kernel CFS throttling.. Effective remediation: Scaled CoreDNS deployment from 2 -> 8 replicas and enabled NodeLocal DNSCache daemonset across all worker nodes..",
+    "symptoms": [
+      "lookup timeout",
+      "dial tcp lookup i/o timeout",
+      "CoreDNS CPU throttling",
+      "DNS failure"
+    ],
+    "root_cause": "CoreDNS deployment was underscaled (only 2 replicas) handling 40,000 queries/sec with strict 100m CPU limit causing kernel CFS throttling.",
+    "fix_applied": "Scaled CoreDNS deployment from 2 -> 8 replicas and enabled NodeLocal DNSCache daemonset across all worker nodes.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 16,
+    "lesson": "Cluster-wide random connection timeouts are frequently CoreDNS CPU starvation rather than target service failure.",
+    "tags": [
+      "infrastructure",
+      "kubernetes",
+      "dns",
+      "coredns",
+      "networking"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:21.223135Z"
+  },
+  {
+    "id": "MEM-125",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-168",
+    "memory_type": "Incident",
+    "title": "Intermittent DNS Resolution Failures Across EKS Cluster",
+    "service": "CoreDNS",
+    "content": "Incident INC-168: Intermittent DNS Resolution Failures Across EKS Cluster\nDescription: Cross-service HTTP and gRPC calls failing intermittently with 'Could not resolve host: service.namespace.svc.cluster.local'.\nLogs excerpt: ERROR [client] dial tcp: lookup auth-service.prod.svc.cluster.local: i/o timeout\nCoreDNS error: 2026-07-19 [ERROR] plugin/errors: 2 auth-service.prod.svc.cluster.local. A: read udp 10.0.12.4:53: i/o timeout\nCoreDNS CPU throttling at 99.8%\nRoot Cause: CoreDNS deployment was underscaled (only 2 replicas) handling 40,000 queries/sec with strict 100m CPU limit causing kernel CFS throttling.\nResolution Fix: Scaled CoreDNS deployment from 2 -> 8 replicas and enabled NodeLocal DNSCache daemonset across all worker nodes.\nOutcome: Resolved",
+    "symptoms": [
+      "lookup timeout",
+      "dial tcp lookup i/o timeout",
+      "CoreDNS CPU throttling",
+      "DNS failure"
+    ],
+    "root_cause": "CoreDNS deployment was underscaled (only 2 replicas) handling 40,000 queries/sec with strict 100m CPU limit causing kernel CFS throttling.",
+    "fix_applied": "Scaled CoreDNS deployment from 2 -> 8 replicas and enabled NodeLocal DNSCache daemonset across all worker nodes.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 16,
+    "lesson": "Cluster-wide random connection timeouts are frequently CoreDNS CPU starvation rather than target service failure.; Deploy NodeLocal DNSCache for any cluster exceeding 50 worker nodes.",
+    "tags": [
+      "infrastructure",
+      "kubernetes",
+      "dns",
+      "coredns",
+      "networking"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:18.932030Z"
+  },
+  {
+    "id": "MEM-124",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-162",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Kafka Ingest Troubleshooting",
+    "service": "Kafka Ingest",
+    "content": "Learned SRE Rule for Kafka Ingest: Check disk partition utilization with `df -h` immediately when I/O operations fail with 'No space left on device'.. Past Fix: Purged uncompressed old logs, corrected logrotate configuration with hourly rotation and 7-day gzip retention, switched logger to INFO level..",
+    "symptoms": [
+      "No space left on device",
+      "disk full",
+      "write failure",
+      "Kafka write rejection"
+    ],
+    "root_cause": "Debug level logging left enabled during staging load test saturated 100GB NVMe partition due to broken logrotate cron.",
+    "fix_applied": "Purged uncompressed old logs, corrected logrotate configuration with hourly rotation and 7-day gzip retention, switched logger to INFO level.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 15,
+    "lesson": "Check disk partition utilization with `df -h` immediately when I/O operations fail with 'No space left on device'.",
+    "tags": [
+      "infrastructure",
+      "disk-space",
+      "kafka",
+      "logging",
+      "storage"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:16.626500Z"
+  },
+  {
+    "id": "MEM-123",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-162",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Kafka Ingest - No space left on device",
+    "service": "Kafka Ingest",
+    "content": "Operational Pattern on Kafka Ingest: When encountering symptoms like No space left on device, disk full, write failure, Kafka write rejection, the root cause is frequently Debug level logging left enabled during staging load test saturated 100GB NVMe partition due to broken logrotate cron.. Effective remediation: Purged uncompressed old logs, corrected logrotate configuration with hourly rotation and 7-day gzip retention, switched logger to INFO level..",
+    "symptoms": [
+      "No space left on device",
+      "disk full",
+      "write failure",
+      "Kafka write rejection"
+    ],
+    "root_cause": "Debug level logging left enabled during staging load test saturated 100GB NVMe partition due to broken logrotate cron.",
+    "fix_applied": "Purged uncompressed old logs, corrected logrotate configuration with hourly rotation and 7-day gzip retention, switched logger to INFO level.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 15,
+    "lesson": "Check disk partition utilization with `df -h` immediately when I/O operations fail with 'No space left on device'.",
+    "tags": [
+      "infrastructure",
+      "disk-space",
+      "kafka",
+      "logging",
+      "storage"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:14.335885Z"
+  },
+  {
+    "id": "MEM-122",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-162",
+    "memory_type": "Incident",
+    "title": "Disk Full /var/log Freezing Message Ingestion",
+    "service": "Kafka Ingest",
+    "content": "Incident INC-162: Disk Full /var/log Freezing Message Ingestion\nDescription: Kafka broker node refusing writes. Local disk utilization reached 100% on /var/log/journal.\nLogs excerpt: FATAL [kafka-broker-3] No space left on device: '/data/kafka-logs/events-0/00000000.log'\nERROR: write /var/log/app.log: no space left on device\nSystemd-journald: Corrupted log rotation file\nRoot Cause: Debug level logging left enabled during staging load test saturated 100GB NVMe partition due to broken logrotate cron.\nResolution Fix: Purged uncompressed old logs, corrected logrotate configuration with hourly rotation and 7-day gzip retention, switched logger to INFO level.\nOutcome: Resolved",
+    "symptoms": [
+      "No space left on device",
+      "disk full",
+      "write failure",
+      "Kafka write rejection"
+    ],
+    "root_cause": "Debug level logging left enabled during staging load test saturated 100GB NVMe partition due to broken logrotate cron.",
+    "fix_applied": "Purged uncompressed old logs, corrected logrotate configuration with hourly rotation and 7-day gzip retention, switched logger to INFO level.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 15,
+    "lesson": "Check disk partition utilization with `df -h` immediately when I/O operations fail with 'No space left on device'.; Ensure logrotate daemon has active systemd timer monitoring.",
+    "tags": [
+      "infrastructure",
+      "disk-space",
+      "kafka",
+      "logging",
+      "storage"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:12.035938Z"
+  },
+  {
+    "id": "MEM-121",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-155",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Inventory Service Troubleshooting",
+    "service": "Inventory Service",
+    "content": "Learned SRE Rule for Inventory Service: Exit Code 137 is always Linux kernel OOM killer terminating the container.. Past Fix: Updated Kubernetes resource limits to 1536Mi memory and configured Java container support flags `-XX:MaxRAMPercentage=75.0`..",
+    "symptoms": [
+      "OOMKilled",
+      "Exit Code 137",
+      "CrashLoopBackOff",
+      "memory limit exceeded"
+    ],
+    "root_cause": "JVM heap memory limit (-Xmx) was configured higher than Kubernetes pod cgroup memory limit (512Mi vs 768Mi heap).",
+    "fix_applied": "Updated Kubernetes resource limits to 1536Mi memory and configured Java container support flags `-XX:MaxRAMPercentage=75.0`.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer terminating the container.",
+    "tags": [
+      "infrastructure",
+      "kubernetes",
+      "oom",
+      "memory",
+      "jvm",
+      "inventory-service"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:09.736196Z"
+  },
+  {
+    "id": "MEM-120",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-155",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Inventory Service - OOMKilled",
+    "service": "Inventory Service",
+    "content": "Operational Pattern on Inventory Service: When encountering symptoms like OOMKilled, Exit Code 137, CrashLoopBackOff, memory limit exceeded, the root cause is frequently JVM heap memory limit (-Xmx) was configured higher than Kubernetes pod cgroup memory limit (512Mi vs 768Mi heap).. Effective remediation: Updated Kubernetes resource limits to 1536Mi memory and configured Java container support flags `-XX:MaxRAMPercentage=75.0`..",
+    "symptoms": [
+      "OOMKilled",
+      "Exit Code 137",
+      "CrashLoopBackOff",
+      "memory limit exceeded"
+    ],
+    "root_cause": "JVM heap memory limit (-Xmx) was configured higher than Kubernetes pod cgroup memory limit (512Mi vs 768Mi heap).",
+    "fix_applied": "Updated Kubernetes resource limits to 1536Mi memory and configured Java container support flags `-XX:MaxRAMPercentage=75.0`.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer terminating the container.",
+    "tags": [
+      "infrastructure",
+      "kubernetes",
+      "oom",
+      "memory",
+      "jvm",
+      "inventory-service"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:07.454628Z"
+  },
+  {
+    "id": "MEM-119",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-155",
+    "memory_type": "Incident",
+    "title": "Inventory Service CrashLoopBackOff - OOMKilled",
+    "service": "Inventory Service",
+    "content": "Incident INC-155: Inventory Service CrashLoopBackOff - OOMKilled\nDescription: Kubernetes pods for inventory-service terminating with Exit Code 137 (OOMKilled) under catalog refresh load.\nLogs excerpt: State: Waiting\n  Reason: CrashLoopBackOff\nLast State: Terminated\n  Reason: OOMKilled\n  Exit Code: 137\nContainer inventory-app exceeded memory limit: 512Mi (used: 518Mi)\nRoot Cause: JVM heap memory limit (-Xmx) was configured higher than Kubernetes pod cgroup memory limit (512Mi vs 768Mi heap).\nResolution Fix: Updated Kubernetes resource limits to 1536Mi memory and configured Java container support flags `-XX:MaxRAMPercentage=75.0`.\nOutcome: Resolved",
+    "symptoms": [
+      "OOMKilled",
+      "Exit Code 137",
+      "CrashLoopBackOff",
+      "memory limit exceeded"
+    ],
+    "root_cause": "JVM heap memory limit (-Xmx) was configured higher than Kubernetes pod cgroup memory limit (512Mi vs 768Mi heap).",
+    "fix_applied": "Updated Kubernetes resource limits to 1536Mi memory and configured Java container support flags `-XX:MaxRAMPercentage=75.0`.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 12,
+    "lesson": "Exit Code 137 is always Linux kernel OOM killer terminating the container.; Container memory limits in Helm/K8s manifests must be at least 30% higher than JVM heap allocations to allow off-heap metaspace.; Setting MaxRAMPercentage prevents manual heap/cgroup mismatches.",
+    "tags": [
+      "infrastructure",
+      "kubernetes",
+      "oom",
+      "memory",
+      "jvm",
+      "inventory-service"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:05.154417Z"
+  },
+  {
+    "id": "MEM-118",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-149",
+    "memory_type": "Learning",
+    "title": "Learned Rule: API Gateway Troubleshooting",
+    "service": "API Gateway",
+    "content": "Learned SRE Rule for API Gateway: Rate limiters should ALWAYS fail-open in production rather than fail-closed during Redis outages.. Past Fix: Increased Redis maxclients to 50,000, set fallback mode to 'fail-open' in gateway configuration, and deployed connection pooling for Redis clients..",
+    "symptoms": [
+      "HTTP 429",
+      "Redis connection timeout",
+      "maxclients reached",
+      "rate limiter freeze"
+    ],
+    "root_cause": "Redis rate limiter sentinel ran out of available file descriptors (maxclients reached 10,000).",
+    "fix_applied": "Increased Redis maxclients to 50,000, set fallback mode to 'fail-open' in gateway configuration, and deployed connection pooling for Redis clients.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 11,
+    "lesson": "Rate limiters should ALWAYS fail-open in production rather than fail-closed during Redis outages.",
+    "tags": [
+      "api",
+      "rate-limiting",
+      "redis",
+      "gateway",
+      "429"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:02.880179Z"
+  },
+  {
+    "id": "MEM-117",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-149",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: API Gateway - HTTP 429",
+    "service": "API Gateway",
+    "content": "Operational Pattern on API Gateway: When encountering symptoms like HTTP 429, Redis connection timeout, maxclients reached, rate limiter freeze, the root cause is frequently Redis rate limiter sentinel ran out of available file descriptors (maxclients reached 10,000).. Effective remediation: Increased Redis maxclients to 50,000, set fallback mode to 'fail-open' in gateway configuration, and deployed connection pooling for Redis clients..",
+    "symptoms": [
+      "HTTP 429",
+      "Redis connection timeout",
+      "maxclients reached",
+      "rate limiter freeze"
+    ],
+    "root_cause": "Redis rate limiter sentinel ran out of available file descriptors (maxclients reached 10,000).",
+    "fix_applied": "Increased Redis maxclients to 50,000, set fallback mode to 'fail-open' in gateway configuration, and deployed connection pooling for Redis clients.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 11,
+    "lesson": "Rate limiters should ALWAYS fail-open in production rather than fail-closed during Redis outages.",
+    "tags": [
+      "api",
+      "rate-limiting",
+      "redis",
+      "gateway",
+      "429"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:33:00.595746Z"
+  },
+  {
+    "id": "MEM-116",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-149",
+    "memory_type": "Incident",
+    "title": "Cascading 429 Too Many Requests Due to Redis Cluster Freeze",
+    "service": "API Gateway",
+    "content": "Incident INC-149: Cascading 429 Too Many Requests Due to Redis Cluster Freeze\nDescription: Legitimate traffic getting throttled globally. Rate limit token bucket checks timing out.\nLogs excerpt: ERROR [rate-limiter] Redis connection timeout to redis-sentinel.internal:6379\nFallback to strict-block mode triggered\nHTTP 429 Too Many Requests returned to 45,000 clients\nRoot Cause: Redis rate limiter sentinel ran out of available file descriptors (maxclients reached 10,000).\nResolution Fix: Increased Redis maxclients to 50,000, set fallback mode to 'fail-open' in gateway configuration, and deployed connection pooling for Redis clients.\nOutcome: Resolved",
+    "symptoms": [
+      "HTTP 429",
+      "Redis connection timeout",
+      "maxclients reached",
+      "rate limiter freeze"
+    ],
+    "root_cause": "Redis rate limiter sentinel ran out of available file descriptors (maxclients reached 10,000).",
+    "fix_applied": "Increased Redis maxclients to 50,000, set fallback mode to 'fail-open' in gateway configuration, and deployed connection pooling for Redis clients.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 11,
+    "lesson": "Rate limiters should ALWAYS fail-open in production rather than fail-closed during Redis outages.; Tune OS ulimit and Redis maxclients on edge ingress infrastructure.",
+    "tags": [
+      "api",
+      "rate-limiting",
+      "redis",
+      "gateway",
+      "429"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:58.311554Z"
+  },
+  {
+    "id": "MEM-115",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-142",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Auth Service Troubleshooting",
+    "service": "Auth Service",
+    "content": "Learned SRE Rule for Auth Service: JWKS key rotation requires dual-key coexistence (grace period) for 48 hours before retiring old keys.. Past Fix: Flushed Redis JWKS cache on API gateway and patched JWKS client to refresh on unknown kid receipt..",
+    "symptoms": [
+      "HTTP 401 Unauthorized",
+      "Invalid signature",
+      "kid missing in JWKS",
+      "key rotation"
+    ],
+    "root_cause": "API gateway cached JWKS public keys with TTL of 24 hours without cache invalidation hook on key rollover.",
+    "fix_applied": "Flushed Redis JWKS cache on API gateway and patched JWKS client to refresh on unknown kid receipt.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "JWKS key rotation requires dual-key coexistence (grace period) for 48 hours before retiring old keys.",
+    "tags": [
+      "api",
+      "auth",
+      "jwt",
+      "security",
+      "jwks",
+      "401"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:56.030728Z"
+  },
+  {
+    "id": "MEM-114",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-142",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Auth Service - HTTP 401 Unauthorized",
+    "service": "Auth Service",
+    "content": "Operational Pattern on Auth Service: When encountering symptoms like HTTP 401 Unauthorized, Invalid signature, kid missing in JWKS, key rotation, the root cause is frequently API gateway cached JWKS public keys with TTL of 24 hours without cache invalidation hook on key rollover.. Effective remediation: Flushed Redis JWKS cache on API gateway and patched JWKS client to refresh on unknown kid receipt..",
+    "symptoms": [
+      "HTTP 401 Unauthorized",
+      "Invalid signature",
+      "kid missing in JWKS",
+      "key rotation"
+    ],
+    "root_cause": "API gateway cached JWKS public keys with TTL of 24 hours without cache invalidation hook on key rollover.",
+    "fix_applied": "Flushed Redis JWKS cache on API gateway and patched JWKS client to refresh on unknown kid receipt.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "JWKS key rotation requires dual-key coexistence (grace period) for 48 hours before retiring old keys.",
+    "tags": [
+      "api",
+      "auth",
+      "jwt",
+      "security",
+      "jwks",
+      "401"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:53.745101Z"
+  },
+  {
+    "id": "MEM-113",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-142",
+    "memory_type": "Incident",
+    "title": "Authentication Failures After JWKS Key Rotation",
+    "service": "Auth Service",
+    "content": "Incident INC-142: Authentication Failures After JWKS Key Rotation\nDescription: All downstream services rejecting incoming user requests with 401 Unauthorized following scheduled key rotation.\nLogs excerpt: ERROR [jwt-validator] Invalid signature for token with kid 'auth-key-2026-b'\nJWKS cache missing key id 'auth-key-2026-b'. Available keys: ['auth-key-2025-a']\nHTTP 401 Unauthorized for 100% of gateway traffic\nRoot Cause: API gateway cached JWKS public keys with TTL of 24 hours without cache invalidation hook on key rollover.\nResolution Fix: Flushed Redis JWKS cache on API gateway and patched JWKS client to refresh on unknown kid receipt.\nOutcome: Resolved",
+    "symptoms": [
+      "HTTP 401 Unauthorized",
+      "Invalid signature",
+      "kid missing in JWKS",
+      "key rotation"
+    ],
+    "root_cause": "API gateway cached JWKS public keys with TTL of 24 hours without cache invalidation hook on key rollover.",
+    "fix_applied": "Flushed Redis JWKS cache on API gateway and patched JWKS client to refresh on unknown kid receipt.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 8,
+    "lesson": "JWKS key rotation requires dual-key coexistence (grace period) for 48 hours before retiring old keys.; Always implement on-demand JWKS cache busting when encountering unknown 'kid' headers.",
+    "tags": [
+      "api",
+      "auth",
+      "jwt",
+      "security",
+      "jwks",
+      "401"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:51.453943Z"
+  },
+  {
+    "id": "MEM-112",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-131",
+    "memory_type": "Learning",
+    "title": "Learned Rule: User Service Troubleshooting",
+    "service": "User Service",
+    "content": "Learned SRE Rule for User Service: Replication lag spikes are almost always triggered by long-running sequential table scans on read replicas.. Past Fix: Created composite B-tree index (org_id, created_at DESC) concurrently on master; replica lag dropped to 200ms within 4 minutes..",
+    "symptoms": [
+      "replication lag",
+      "stale data",
+      "table scan",
+      "replica CPU spike"
+    ],
+    "root_cause": "Unindexed table scan on user_activity_log table locking replica CPU during heavy read bursts.",
+    "fix_applied": "Created composite B-tree index (org_id, created_at DESC) concurrently on master; replica lag dropped to 200ms within 4 minutes.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 18,
+    "lesson": "Replication lag spikes are almost always triggered by long-running sequential table scans on read replicas.",
+    "tags": [
+      "database",
+      "replica",
+      "indexing",
+      "performance",
+      "user-service"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:49.167200Z"
+  },
+  {
+    "id": "MEM-111",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-131",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: User Service - replication lag",
+    "service": "User Service",
+    "content": "Operational Pattern on User Service: When encountering symptoms like replication lag, stale data, table scan, replica CPU spike, the root cause is frequently Unindexed table scan on user_activity_log table locking replica CPU during heavy read bursts.. Effective remediation: Created composite B-tree index (org_id, created_at DESC) concurrently on master; replica lag dropped to 200ms within 4 minutes..",
+    "symptoms": [
+      "replication lag",
+      "stale data",
+      "table scan",
+      "replica CPU spike"
+    ],
+    "root_cause": "Unindexed table scan on user_activity_log table locking replica CPU during heavy read bursts.",
+    "fix_applied": "Created composite B-tree index (org_id, created_at DESC) concurrently on master; replica lag dropped to 200ms within 4 minutes.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 18,
+    "lesson": "Replication lag spikes are almost always triggered by long-running sequential table scans on read replicas.",
+    "tags": [
+      "database",
+      "replica",
+      "indexing",
+      "performance",
+      "user-service"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:46.869595Z"
+  },
+  {
+    "id": "MEM-110",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-131",
+    "memory_type": "Incident",
+    "title": "Read Replica Lag Causing Stale User Dashboard",
+    "service": "User Service",
+    "content": "Incident INC-131: Read Replica Lag Causing Stale User Dashboard\nDescription: User profile and dashboard updates not reflecting immediately. Read replicas lagging by 480 seconds.\nLogs excerpt: WARN [replica-monitor] Replication lag on db-read-02 exceeded SLA (current: 485s, threshold: 30s)\nQuery duration: 42000ms for SELECT * FROM user_activity_log WHERE org_id = ?\nRoot Cause: Unindexed table scan on user_activity_log table locking replica CPU during heavy read bursts.\nResolution Fix: Created composite B-tree index (org_id, created_at DESC) concurrently on master; replica lag dropped to 200ms within 4 minutes.\nOutcome: Resolved",
+    "symptoms": [
+      "replication lag",
+      "stale data",
+      "table scan",
+      "replica CPU spike"
+    ],
+    "root_cause": "Unindexed table scan on user_activity_log table locking replica CPU during heavy read bursts.",
+    "fix_applied": "Created composite B-tree index (org_id, created_at DESC) concurrently on master; replica lag dropped to 200ms within 4 minutes.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 18,
+    "lesson": "Replication lag spikes are almost always triggered by long-running sequential table scans on read replicas.; Use CREATE INDEX CONCURRENTLY to avoid blocking read traffic.",
+    "tags": [
+      "database",
+      "replica",
+      "indexing",
+      "performance",
+      "user-service"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:44.589494Z"
+  },
+  {
+    "id": "MEM-109",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-125",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Order Service Troubleshooting",
+    "service": "Order Service",
+    "content": "Learned SRE Rule for Order Service: Ensure all multi-row locking transactions acquire row locks in deterministic alphabetical or ID order.. Past Fix: Normalized row-locking sequence in inventory_service.py using SELECT FOR UPDATE in strictly ascending SKU order..",
+    "symptoms": [
+      "deadlock detected",
+      "SQLState 40P01",
+      "ShareLock wait",
+      "HTTP 500"
+    ],
+    "root_cause": "Conflicting lock acquisition order between inventory deduction and order status update queries in concurrent workers.",
+    "fix_applied": "Normalized row-locking sequence in inventory_service.py using SELECT FOR UPDATE in strictly ascending SKU order.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 22,
+    "lesson": "Ensure all multi-row locking transactions acquire row locks in deterministic alphabetical or ID order.",
+    "tags": [
+      "database",
+      "postgres",
+      "deadlock",
+      "orders",
+      "locking"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:42.295489Z"
+  },
+  {
+    "id": "MEM-108",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-125",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Order Service - deadlock detected",
+    "service": "Order Service",
+    "content": "Operational Pattern on Order Service: When encountering symptoms like deadlock detected, SQLState 40P01, ShareLock wait, HTTP 500, the root cause is frequently Conflicting lock acquisition order between inventory deduction and order status update queries in concurrent workers.. Effective remediation: Normalized row-locking sequence in inventory_service.py using SELECT FOR UPDATE in strictly ascending SKU order..",
+    "symptoms": [
+      "deadlock detected",
+      "SQLState 40P01",
+      "ShareLock wait",
+      "HTTP 500"
+    ],
+    "root_cause": "Conflicting lock acquisition order between inventory deduction and order status update queries in concurrent workers.",
+    "fix_applied": "Normalized row-locking sequence in inventory_service.py using SELECT FOR UPDATE in strictly ascending SKU order.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 22,
+    "lesson": "Ensure all multi-row locking transactions acquire row locks in deterministic alphabetical or ID order.",
+    "tags": [
+      "database",
+      "postgres",
+      "deadlock",
+      "orders",
+      "locking"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:40.011573Z"
+  },
+  {
+    "id": "MEM-107",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-125",
+    "memory_type": "Incident",
+    "title": "PostgreSQL Deadlock Detected on Order Processing",
+    "service": "Order Service",
+    "content": "Incident INC-125: PostgreSQL Deadlock Detected on Order Processing\nDescription: Order placement requests failing with 500 Internal Server Error. Deadlock detected in database transaction logs.\nLogs excerpt: ERROR: deadlock detected\nDETAIL: Process 4120 waits for ShareLock on transaction 88102; blocked by process 4118.\nHINT: See server log for query details.\nSQLState: 40P01\nRoot Cause: Conflicting lock acquisition order between inventory deduction and order status update queries in concurrent workers.\nResolution Fix: Normalized row-locking sequence in inventory_service.py using SELECT FOR UPDATE in strictly ascending SKU order.\nOutcome: Resolved",
+    "symptoms": [
+      "deadlock detected",
+      "SQLState 40P01",
+      "ShareLock wait",
+      "HTTP 500"
+    ],
+    "root_cause": "Conflicting lock acquisition order between inventory deduction and order status update queries in concurrent workers.",
+    "fix_applied": "Normalized row-locking sequence in inventory_service.py using SELECT FOR UPDATE in strictly ascending SKU order.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 22,
+    "lesson": "Ensure all multi-row locking transactions acquire row locks in deterministic alphabetical or ID order.; Deadlock 40P01 errors cannot be resolved by scaling hardware; code-level ordering is required.",
+    "tags": [
+      "database",
+      "postgres",
+      "deadlock",
+      "orders",
+      "locking"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:37.715658Z"
+  },
+  {
+    "id": "MEM-106",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-118",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Payment API Troubleshooting",
+    "service": "Payment API",
+    "content": "Learned SRE Rule for Payment API: Payment API 503s with 'Read timed out' are 90% correlated with DB connection pool exhaustion rather than DB engine crashes.. Past Fix: Restarted connection pool supervisor and increased pool capacity from 75 -> 120 with aggressive 5s query timeout..",
+    "symptoms": [
+      "HTTP 503",
+      "pool capacity 100%",
+      "Read timed out",
+      "connection saturation"
+    ],
+    "root_cause": "Database connection saturation caused by sudden burst of webhook callbacks holding connections open.",
+    "fix_applied": "Restarted connection pool supervisor and increased pool capacity from 75 -> 120 with aggressive 5s query timeout.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 9,
+    "lesson": "Payment API 503s with 'Read timed out' are 90% correlated with DB connection pool exhaustion rather than DB engine crashes.",
+    "tags": [
+      "database",
+      "payment-api",
+      "pool",
+      "saturation",
+      "503"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:35.425434Z"
+  },
+  {
+    "id": "MEM-105",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-118",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Payment API - HTTP 503",
+    "service": "Payment API",
+    "content": "Operational Pattern on Payment API: When encountering symptoms like HTTP 503, pool capacity 100%, Read timed out, connection saturation, the root cause is frequently Database connection saturation caused by sudden burst of webhook callbacks holding connections open.. Effective remediation: Restarted connection pool supervisor and increased pool capacity from 75 -> 120 with aggressive 5s query timeout..",
+    "symptoms": [
+      "HTTP 503",
+      "pool capacity 100%",
+      "Read timed out",
+      "connection saturation"
+    ],
+    "root_cause": "Database connection saturation caused by sudden burst of webhook callbacks holding connections open.",
+    "fix_applied": "Restarted connection pool supervisor and increased pool capacity from 75 -> 120 with aggressive 5s query timeout.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 9,
+    "lesson": "Payment API 503s with 'Read timed out' are 90% correlated with DB connection pool exhaustion rather than DB engine crashes.",
+    "tags": [
+      "database",
+      "payment-api",
+      "pool",
+      "saturation",
+      "503"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:33.138399Z"
+  },
+  {
+    "id": "MEM-104",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-118",
+    "memory_type": "Incident",
+    "title": "Payment API 503 - DB Connection Saturation",
+    "service": "Payment API",
+    "content": "Incident INC-118: Payment API 503 - DB Connection Saturation\nDescription: Payment microservice returning intermittent 503 errors and DB pool queue backlog.\nLogs excerpt: WARN [db-client] Pool size 50 reached 100% capacity\nERROR [api-gateway] Upstream service returned 503 for /v2/charge\nSocketTimeoutException: Read timed out to db-master.internal:5432\nRoot Cause: Database connection saturation caused by sudden burst of webhook callbacks holding connections open.\nResolution Fix: Restarted connection pool supervisor and increased pool capacity from 75 -> 120 with aggressive 5s query timeout.\nOutcome: Resolved",
+    "symptoms": [
+      "HTTP 503",
+      "pool capacity 100%",
+      "Read timed out",
+      "connection saturation"
+    ],
+    "root_cause": "Database connection saturation caused by sudden burst of webhook callbacks holding connections open.",
+    "fix_applied": "Restarted connection pool supervisor and increased pool capacity from 75 -> 120 with aggressive 5s query timeout.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 9,
+    "lesson": "Payment API 503s with 'Read timed out' are 90% correlated with DB connection pool exhaustion rather than DB engine crashes.; Adjusting pool size + timeout limits avoids full service restarts.",
+    "tags": [
+      "database",
+      "payment-api",
+      "pool",
+      "saturation",
+      "503"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:30.850647Z"
+  },
+  {
+    "id": "MEM-103",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-104",
+    "memory_type": "Learning",
+    "title": "Learned Rule: Payment API Troubleshooting",
+    "service": "Payment API",
+    "content": "Learned SRE Rule for Payment API: Always inspect connection pool saturation metrics before restarting PostgreSQL instances.. Past Fix: Increased max connection pool size from 50 -> 100 in database.yaml and deployed patch closing leaked sessions in retry middleware..",
+    "symptoms": [
+      "connection pool exhausted",
+      "database timeout",
+      "HTTP 503",
+      "payment timeout"
+    ],
+    "root_cause": "PostgreSQL connection pool saturation due to unclosed connection leak in async retry loop under high traffic.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and deployed patch closing leaked sessions in retry middleware.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 14,
+    "lesson": "Always inspect connection pool saturation metrics before restarting PostgreSQL instances.",
+    "tags": [
+      "database",
+      "postgres",
+      "pool-exhaustion",
+      "payment-api",
+      "503"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:28.553738Z"
+  },
+  {
+    "id": "MEM-102",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-104",
+    "memory_type": "Operational",
+    "title": "Operational Pattern: Payment API - connection pool exhausted",
+    "service": "Payment API",
+    "content": "Operational Pattern on Payment API: When encountering symptoms like connection pool exhausted, database timeout, HTTP 503, payment timeout, the root cause is frequently PostgreSQL connection pool saturation due to unclosed connection leak in async retry loop under high traffic.. Effective remediation: Increased max connection pool size from 50 -> 100 in database.yaml and deployed patch closing leaked sessions in retry middleware..",
+    "symptoms": [
+      "connection pool exhausted",
+      "database timeout",
+      "HTTP 503",
+      "payment timeout"
+    ],
+    "root_cause": "PostgreSQL connection pool saturation due to unclosed connection leak in async retry loop under high traffic.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and deployed patch closing leaked sessions in retry middleware.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 14,
+    "lesson": "Always inspect connection pool saturation metrics before restarting PostgreSQL instances.",
+    "tags": [
+      "database",
+      "postgres",
+      "pool-exhaustion",
+      "payment-api",
+      "503"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:26.262006Z"
+  },
+  {
+    "id": "MEM-101",
+    "bank_id": "incidentiq-ops",
+    "incident_id": "INC-104",
+    "memory_type": "Incident",
+    "title": "Database Connection Timeout on Checkout Gateway",
+    "service": "Payment API",
+    "content": "Incident INC-104: Database Connection Timeout on Checkout Gateway\nDescription: Users encountering 503 Service Unavailable during checkout. Database connections timing out after 30s threshold.\nLogs excerpt: ERROR 2026-08-12 14:22:01 [pool-manager] connection pool exhausted (max=50, in_use=50, waiting=142)\nFATAL [checkout-svc] database timeout after 30000ms executing SQL: SELECT * FROM payment_methods WHERE customer_id = ?\nHTTP/1.1 503 Service Unavailable\nRoot Cause: PostgreSQL connection pool saturation due to unclosed connection leak in async retry loop under high traffic.\nResolution Fix: Increased max connection pool size from 50 -> 100 in database.yaml and deployed patch closing leaked sessions in retry middleware.\nOutcome: Resolved",
+    "symptoms": [
+      "connection pool exhausted",
+      "database timeout",
+      "HTTP 503",
+      "payment timeout"
+    ],
+    "root_cause": "PostgreSQL connection pool saturation due to unclosed connection leak in async retry loop under high traffic.",
+    "fix_applied": "Increased max connection pool size from 50 -> 100 in database.yaml and deployed patch closing leaked sessions in retry middleware.",
+    "outcome": "Resolved",
+    "resolution_time_minutes": 14,
+    "lesson": "Always inspect connection pool saturation metrics before restarting PostgreSQL instances.; Connection pool exhaustion typically mimics database crash but is purely client pool constraint.; Increasing pool size from 50 to 100 instantly restored 99.9% checkout availability.",
+    "tags": [
+      "database",
+      "postgres",
+      "pool-exhaustion",
+      "payment-api",
+      "503"
+    ],
+    "metadata": {},
+    "created_at": "2026-09-28T12:32:23.792119Z"
+  }
+]
